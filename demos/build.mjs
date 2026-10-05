@@ -132,14 +132,37 @@ demos.erp = async function erp() {
   const { execSync } = await import('node:child_process')
   const root = resolve(here, '../../erp-sii/front')
   const out = resolve(here, 'erp/dist')
-  const mainPath = resolve(root, 'src/main.js'), tmp = resolve(root, 'src/__demo__')
-  const main = readFileSync(mainPath, 'utf8')
+  const tmp = resolve(root, 'src/__demo__')
+  // Retouches propres à la démo, présentée sous le nom « Picsou » sans le nom ni le logo de SII.
+  // Elles ne durent que le temps du build : chaque fichier est remis tel quel ensuite.
+  const LOGO = '../assets/img/Piscou-logo-primaire-svg.svg', DEMO_LOGO = '../__demo__/picsou-logo.svg'
+  const patches = {
+    'src/main.js': [['import { createApp }', "import './__demo__/setup'\nimport { createApp }"]],
+    'public/index.html': [['<title>SII | PICSOU</title>', '<title>Picsou</title>']],
+    'src/components/MyToolbar.vue': [[LOGO, DEMO_LOGO]],
+    'src/components/Connexion.vue': [[LOGO, DEMO_LOGO]],
+    'src/components/Dashboard.vue': [['Total de collaborateurs SII Le Mans', 'Total de collaborateurs']],
+    'src/components/Client.vue': [['Clients SII Le Mans', 'Clients']],
+    'src/components/Collaborateurs.vue': [['Collaborateurs SII Le Mans', 'Collaborateurs']],
+    'src/components/Pdc.vue': [['Hors SII', 'Hors effectif']],
+    'src/components/forms/add/AddCollabForm.vue': [['@sii.fr', '@exemple.fr']],
+    'src/components/forms/update/UpdateCollabForm.vue': [['@sii.fr', '@exemple.fr']],
+  }
+  const originals = {}
   try {
-    for (const f of ['setup.js', 'demo-key.js', 'snapshot.json']) cpSync(resolve(here, 'erp', f), resolve(tmp, f))
-    writeFileSync(mainPath, "import './__demo__/setup'\n" + main)
+    for (const f of ['setup.js', 'demo-key.js', 'snapshot.json', 'picsou-logo.svg']) cpSync(resolve(here, 'erp', f), resolve(tmp, f))
+    for (const [file, list] of Object.entries(patches)) {
+      const p = resolve(root, file)
+      let text = originals[p] = readFileSync(p, 'utf8')
+      for (const [from, to] of list) {
+        if (!text.includes(from)) throw new Error(`Retouche introuvable dans ${file} : ${from}`)
+        text = text.split(from).join(to)
+      }
+      writeFileSync(p, text)
+    }
     execSync(`npx vue-cli-service build --dest "${out}"`, { cwd: root, stdio: 'inherit' })
   } finally {
-    writeFileSync(mainPath, main)
+    for (const [p, text] of Object.entries(originals)) writeFileSync(p, text)
     rmSync(tmp, { recursive: true, force: true })
   }
   const recorded = new Date(JSON.parse(readFileSync(resolve(here, 'erp/snapshot.json'), 'utf8')).recordedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })

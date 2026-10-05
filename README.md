@@ -20,7 +20,7 @@ La configuration (nom du Worker, domaine) est dans `wrangler.jsonc`.
 | Sites restaurant | https://resto.topo-host.com | `../laromate` |
 | Hélio | https://helio.topo-host.com | `../helpdesk/vue-app` |
 | Bloom | https://bloom.topo-host.com | `../bloom` |
-| ERP SII (Picsou) | https://erp.topo-host.com | `../erp-sii/front` (réponses de l'API enregistrées) |
+| Picsou | https://picsou.topo-host.com | `../erp-sii/front` (réponses de l'API enregistrées) |
 | La Truffe Gourmande | https://truffe.topo-host.com | `../truffe-gourmande` (copie des pages, sans build) |
 
 Les démos sont compilées à partir des dépôts voisins, sans rien y écrire durablement. Firebase y est
@@ -36,9 +36,9 @@ npx wrangler deploy --config demos/resto/wrangler.jsonc
 Pour Bloom, le script ajoute temporairement la redirection vers le faux Firebase dans
 `metro.config.js` et passe le web en mode « single » dans `app.json`, puis restaure les deux fichiers.
 
-## ERP SII : une démo sans serveur
+## Picsou : une démo sans serveur
 
-L'ERP a une vraie API (Express + PostgreSQL). Pour la démo, on enregistre une fois ses réponses sur des
+Picsou a une vraie API (Express + PostgreSQL). Pour la démo, on enregistre une fois ses réponses sur des
 données fictives, puis l'interface les rejoue dans le navigateur :
 
 1. lancer la base et l'API en local (voir `D:\dev\erp-sii\LISEZMOI.md`) ;
