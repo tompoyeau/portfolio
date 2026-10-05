@@ -48,3 +48,14 @@ données fictives, puis l'interface les rejoue dans le navigateur :
 `demos/erp/setup.js` remplace le serveur (adaptateur axios), connecte le visiteur d'office et fige
 l'horloge à la date de l'enregistrement, pour que l'exercice en cours et les statistiques restent
 cohérents. Les écritures sont acceptées mais pas enregistrées.
+
+## CV
+
+Le CV est une page HTML d'une page A4 (`cv/cv.html`), aux couleurs et typographies du site. Pour le régénérer en PDF :
+
+```bash
+node cv/build-pdf.mjs
+```
+
+Le script écrit `public/cv-tom-poyeau.pdf` (téléchargeable depuis le site) et une copie dans
+`Documents\Lettre et CV\CV\CV de Tom Poyeau 2026 - portfolio.pdf`, et signale si le contenu déborde de la page.

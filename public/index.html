@@ -176,6 +176,32 @@ dl{margin:0}
 .human{font:400 12.5px/1.4 var(--body);background:#E9EDF2;color:#3A4656;border:1px solid #C6CEDA;padding:10px 12px;border-radius:4px;max-width:30ch}
 .human b{display:block;font-weight:600;margin-bottom:2px}
 
+/* Parcours : expérience à gauche (la plus longue), formation et contact à droite */
+.cv{padding-block:64px 8px}
+.cv-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px 24px;margin-bottom:28px}
+.cv-head h2{font-size:clamp(32px,4.4vw,46px);font-weight:800;letter-spacing:-.015em}
+.cv-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px}
+.cv h3.col{font:500 13px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.step{display:grid;grid-template-columns:118px minmax(0,1fr);gap:16px;padding-block:18px;border-bottom:1px dashed var(--line)}
+.step .when{font:400 13px/1.45 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.step h4{margin:0;font:700 19px/1.2 var(--display);letter-spacing:-.01em;text-wrap:balance}
+.step .org{margin-top:4px;font-weight:500}
+.step .org span{color:var(--muted);font-weight:400}
+.step .points{margin-top:10px;gap:6px}
+.step .points a{color:var(--ink);font-weight:600}
+.side{display:grid;gap:36px;align-content:start}
+.contact{display:grid;gap:10px;margin-top:14px}
+.contact div{display:grid;grid-template-columns:82px minmax(0,1fr);gap:12px;align-items:baseline}
+.contact dt{font:400 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.contact dd{margin:0;overflow-wrap:anywhere}
+.contact a{color:var(--ink)}
+.side .tags{margin-top:14px}
+.hello{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:20px;font-size:15px}
+@media (max-width:820px){
+  .cv-grid{grid-template-columns:1fr;gap:40px}
+  .step{grid-template-columns:1fr;gap:6px}
+}
+
 footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;color:var(--muted);font-size:14px}
 
 @media (max-width:820px){
@@ -211,6 +237,7 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
     <p class="kicker">Développeur web, mobile et desktop</p>
     <h1>Tom Poyeau<span class="dot">.</span></h1>
     <p class="intro">Je conçois des outils qui servent pour de vrai : une app de planning utilisée par mon équipe, un utilitaire réseau en production, un launcher de jeux mis à jour automatiquement, et des sites prêts à vendre.</p>
+    <p class="hello"><a href="#parcours">Mon parcours</a><a href="/cv-tom-poyeau.pdf" target="_blank" rel="noopener">CV en PDF</a><a href="mailto:tompoyeau@hotmail.fr">tompoyeau@hotmail.fr</a></p>
   </div>
   <dl class="facts">
     <div><dt>Front</dt><dd>Vue 3, React Native, TypeScript, Tailwind</dd></div>
@@ -438,8 +465,78 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 
 </main>
 
+<section class="cv" id="parcours" aria-labelledby="parcours-titre">
+  <div class="cv-head">
+    <h2 id="parcours-titre">Parcours</h2>
+    <a class="cta" href="/cv-tom-poyeau.pdf" target="_blank" rel="noopener">Télécharger mon CV (PDF)</a>
+  </div>
+  <div class="cv-grid">
+    <div>
+      <h3 class="col">Expérience</h3>
+      <div class="step">
+        <p class="when">Avril 2025<br>→ aujourd'hui</p>
+        <div>
+          <h4>Technicien support informatique (helpdesk)</h4>
+          <p class="org">Apside, pour le client Covéa <span>· Le Mans</span></p>
+          <ul class="points">
+            <li>Diagnostic des problèmes matériels et logiciels, et mise en place de solutions adaptées.</li>
+            <li>Installation, configuration et mise à jour des équipements et des logiciels.</li>
+            <li>Escalade des incidents complexes avec les équipes techniques.</li>
+            <li>Création d'outils pour l'équipe : <a href="#helio">Hélio</a> et <a href="#pingwatch">PingWatch</a>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <p class="when">Sept. 2022<br>→ sept. 2024</p>
+        <div>
+          <h4>Développeur full-stack en alternance</h4>
+          <p class="org">SII <span>· Le Mans</span></p>
+          <ul class="points">
+            <li>Développement et maintenance d'applications web, côté interface et côté serveur.</li>
+            <li>Intégration d'API et gestion des bases de données.</li>
+            <li>Documentation technique pour la maintenance et la formation des utilisateurs.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <p class="when">Sept. 2021<br>→ sept. 2022</p>
+        <div>
+          <h4>Développeur full-stack en alternance</h4>
+          <p class="org">Distrimob <span>· Sablé-sur-Sarthe</span></p>
+          <ul class="points">
+            <li>Développement et maintenance d'applications web full-stack.</li>
+            <li>Gestion et optimisation des bases de données.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div>
+        <h3 class="col">Formation</h3>
+        <div class="step"><p class="when">2022 → 2024</p><div><h4>Master Ingénieur informatique, option Lead Developer</h4><p class="org">Institut d'Informatique Appliquée <span>· Laval</span></p></div></div>
+        <div class="step"><p class="when">2021 → 2022</p><div><h4>Bachelor Responsable en ingénierie des logiciels</h4><p class="org">CESI <span>· Le Mans</span></p></div></div>
+        <div class="step"><p class="when">2019 → 2021</p><div><h4>BTS SIO, option SLAM</h4><p class="org">Lycée André Malraux <span>· Allonnes</span></p></div></div>
+      </div>
+      <div>
+        <h3 class="col">Contact</h3>
+        <dl class="contact">
+          <div><dt>E-mail</dt><dd><a href="mailto:tompoyeau@hotmail.fr">tompoyeau@hotmail.fr</a></dd></div>
+          <div><dt>Téléphone</dt><dd><a href="tel:+33763275088">07 63 27 50 88</a></dd></div>
+          <div><dt>Ville</dt><dd>Le Mans · véhiculé</dd></div>
+          <div><dt>GitHub</dt><dd><a href="https://github.com/tompoyeau" target="_blank" rel="noopener">github.com/tompoyeau</a></dd></div>
+        </dl>
+      </div>
+      <div>
+        <h3 class="col">Aussi</h3>
+        <div class="tags"><span>Java Spring</span><span>Angular</span><span>PHP / Symfony</span><span>Anglais</span><span>Escalade</span><span>Musique</span><span>Jeux vidéo</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
-  <span>Tom Poyeau · 2026</span>
+  <span>Tom Poyeau · Le Mans · <a href="mailto:tompoyeau@hotmail.fr">tompoyeau@hotmail.fr</a></span>
   <a href="https://github.com/tompoyeau" target="_blank" rel="noopener">github.com/tompoyeau</a>
 </footer>
 </div>
