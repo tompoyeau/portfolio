@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PingWatch, démo</title>
+<meta name="description" content="Démo simulée de PingWatch : suivi en direct des sites dont la connexion internet est tombée.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout : bandeau d'explication, puis une fenêtre d'application façon Windows qui occupe la largeur. */
+:root{
+  --page:#E9ECF1; --win:#FFFFFF; --chrome:#F3F5F8; --ink:#1B2230; --muted:#5F6878; --line:#DCE1E8; --row:#FFFFFF; --row-alt:#FAFBFC;
+  --sel:#E6EDFC; --accent:#2944D6;
+  --down:#D64541; --partial:#E8603C; --flap:#8E44AD; --degraded:#E08E0B; --up:#2E9E5B; --pending:#95A5A6;
+  --tint-down:rgba(214,69,65,.10); --tint-partial:rgba(232,96,60,.09); --tint-flap:rgba(142,68,173,.09);
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",Consolas,ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --page:#0F1217; --win:#171B22; --chrome:#1D222B; --ink:#E6EAF0; --muted:#98A1B0; --line:#2B313C; --row:#171B22; --row-alt:#1A1F27;
+  --sel:#232C47; --accent:#8EA2FF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --page:#0F1217; --win:#171B22; --chrome:#1D222B; --ink:#E6EAF0; --muted:#98A1B0; --line:#2B313C; --row:#171B22; --row-alt:#1A1F27;
+  --sel:#232C47; --accent:#8EA2FF; color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--ink);font:400 14px/1.5 var(--body);padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1280px;margin-inline:auto;display:grid;gap:16px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+
+.intro{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:start}
+.intro h1{font-size:22px;margin:0;line-height:1.2}
+.intro p{margin:6px 0 0;color:var(--muted);max-width:75ch}
+.back{font-size:14px;white-space:nowrap}
+.try{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding:0;list-style:none}
+.try li{font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--win);color:var(--muted)}
+.try b{color:var(--ink);font-weight:600}
+
+.window{background:var(--win);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 30px rgba(20,30,50,.10);overflow:hidden}
+.titlebar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--chrome);border-bottom:1px solid var(--line);font-size:13px}
+.titlebar .logo{width:16px;height:16px;border-radius:4px;background:var(--up);display:grid;place-items:center;color:#fff;font:700 10px/1 var(--mono)}
+.titlebar .ctl{margin-left:auto;display:flex;gap:14px;color:var(--muted);font-family:var(--mono);user-select:none}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
+button,input,select{font:inherit;color:inherit}
+.btn{padding:6px 12px;border:1px solid var(--line);background:var(--win);border-radius:5px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.field{padding:6px 10px;border:1px solid var(--line);background:var(--win);border-radius:5px;min-width:0}
+.spacer{flex:1}
+.tabs{display:flex;gap:2px;padding:0 12px;border-bottom:1px solid var(--line);background:var(--chrome)}
+.tab{padding:8px 14px;border:0;background:none;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.summary{display:flex;flex-wrap:wrap;gap:16px;padding:8px 12px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line)}
+.summary b{font-variant-numeric:tabular-nums;color:var(--ink)}
+
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:1020px;font-size:13px}
+th{position:sticky;top:0;background:var(--chrome);text-align:left;font-weight:500;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:12px}
+td{padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--row)}
+tbody tr:nth-child(even) td{background:var(--row-alt)}
+tr.t-down td{background:var(--tint-down)!important}
+tr.t-partial td{background:var(--tint-partial)!important}
+tr.t-flap td{background:var(--tint-flap)!important}
+tr.child td{color:var(--muted)}
+tr.child td.lbl{padding-left:34px;font-family:var(--mono);font-size:12.5px}
+td.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:12.5px}
+td.mono{font-family:var(--mono);font-size:12.5px}
+.st{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 var(--mono);color:var(--c)}
+.st::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.tw{border:0;background:none;cursor:pointer;width:18px;color:var(--muted);padding:0;font-size:11px}
+.lbl strong{font-weight:600}
+.r5g{border:1px solid var(--line);background:var(--win);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px}
+.r5g.s-envoye{color:#2944D6;border-color:#9FB0F0}
+.r5g.s-place{color:var(--up);border-color:var(--up)}
+.r5g.s-recup{color:var(--degraded);border-color:var(--degraded)}
+.ref{color:var(--accent);text-decoration:underline;text-underline-offset:2px;font-family:var(--mono);font-size:12.5px}
+.timeline{display:flex;gap:1px;align-items:flex-end;height:16px}
+.timeline i{width:3px;border-radius:1px}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--win);padding:10px 16px;border-radius:6px;font-size:13px;max-width:calc(100% - 32px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.log{padding:8px 12px;font:12px/1.6 var(--mono);color:var(--muted);border-top:1px solid var(--line);background:var(--chrome);max-height:96px;overflow:auto}
+.log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note{font-size:12.5px;color:var(--muted)}
+@media (max-width:720px){.intro{grid-template-columns:1fr}.back{order:-1}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="intro">
+    <div>
+      <h1>PingWatch · démo simulée</h1>
+      <p>PingWatch suit en direct les sites d'une entreprise qui ont perdu leur connexion. Cette page reproduit l'application avec des agences fictives : aucune vraie adresse n'est contactée, les coupures sont simulées.</p>
+      <ul class="try">
+        <li><b>Dépliez</b> une agence pour voir ses adresses</li>
+        <li><b>Cliquez</b> sur un routeur 5G pour changer son état</li>
+        <li><b>Ajoutez</b> 10.20.3.4 : elle rejoint l'agence voisine</li>
+        <li><b>Provoquez</b> une coupure</li>
+      </ul>
+    </div>
+    <a class="back" href="/#pingwatch">← Retour au portfolio</a>
+  </section>
+
+  <div class="window" role="application" aria-label="Fenêtre PingWatch simulée">
+    <div class="titlebar"><span class="logo">P</span>PingWatch 2.4 <span class="note">— démo</span><span class="ctl" aria-hidden="true"><span>—</span><span>☐</span><span>✕</span></span></div>
+    <form class="toolbar" id="addForm" autocomplete="off">
+      <input class="field" id="addIp" placeholder="Adresse IP (ex. 10.20.3.4)" aria-label="Adresse IP à surveiller" size="22">
+      <input class="field" id="addName" placeholder="Nom de l'agence (si nouvelle)" aria-label="Nom de l'agence" size="24">
+      <button class="btn primary" type="submit">Ajouter</button>
+      <button class="btn" type="button" id="cutBtn">Provoquer une coupure</button>
+      <span class="spacer"></span>
+      <input class="field" id="filter" type="search" placeholder="Filtrer (Ctrl+F)" aria-label="Filtrer la liste" size="18">
+      <button class="btn" type="button" id="pauseBtn" aria-pressed="false">Pause</button>
+    </form>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tabList" aria-selected="true" aria-controls="panelList">Agences suivies</button>
+      <button class="tab" role="tab" id="tabStock" aria-selected="false" aria-controls="panelStock">Stock routeurs 5G</button>
+    </div>
+    <div id="panelList" role="tabpanel" aria-labelledby="tabList">
+      <div class="summary" id="summary"></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th>État</th><th>Agence / adresse</th><th>Réf. ticket</th><th>Routeurs 5G</th><th>Dans cet état</th>
+            <th>Tombée le</th><th>Remontée le</th><th>Derniers pings</th><th>Latence</th><th>Perte réc.</th><th>Coupures</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="panelStock" role="tabpanel" aria-labelledby="tabStock" hidden>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Routeur</th><th>Catégorie</th><th>État</th><th>Agence</th><th>Depuis le</th></tr></thead>
+          <tbody id="stockRows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="log" id="log" aria-live="polite"></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  const STATUS = {
+    down: ["KO", "var(--down)", 0], partial: ["KO partiel", "var(--partial)", 1], flap: ["BAGOT", "var(--flap)", 2],
+    degraded: ["DÉGRADÉ", "var(--degraded)", 3], pending: ["…", "var(--pending)", 4], up: ["OK", "var(--up)", 5],
+  };
+  const R5G = [["Aucun", ""], ["Envoyé", "s-envoye"], ["En place", "s-place"], ["En récupération", "s-recup"]];
+  const WINDOW = 60;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const now = () => Date.now();
+  const ipNum = ip => ip.split(".").reduce((a, b) => a * 256 + +b, 0);
+  const validIp = ip => /^(\d{1,3}\.){3}\d{1,3}$/.test(ip) && ip.split(".").every(n => +n <= 255);
+  const clock = ts => ts ? new Date(ts).toLocaleTimeString("fr-FR") : "";
+  const dur = ms => { const s = Math.floor(ms / 1000); return s < 60 ? s + " s" : s < 3600 ? Math.floor(s / 60) + " min " + String(s % 60).padStart(2, "0") + " s" : Math.floor(s / 3600) + " h " + String(Math.floor(s % 3600 / 60)).padStart(2, "0"); };
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  // Hôte simulé : `mode` pilote les pings générés (up, down, flap, degraded).
+  function host(ip, mode = "up") { return { ip, mode, pings: [], since: now(), status: "pending", outages: 0, wasDown: false }; }
+  let seq = 4817;
+  const agencies = [
+    { id: 1, name: "Agence Rennes Centre", ref: "INC" + seq++, r5g: 2, open: true, hosts: [host("10.20.1.1"), host("10.20.1.2", "down"), host("10.20.1.3", "down")], outages: 0 },
+    { id: 2, name: "Point de vente Gare", ref: "INC" + seq++, r5g: 1, open: false, hosts: [host("10.20.1.72", "down")], outages: 0 },
+    { id: 3, name: "Agence Nantes Erdre", ref: "INC" + seq++, r5g: 0, open: false, hosts: [host("10.20.3.1", "flap"), host("10.20.3.2", "flap"), host("10.20.3.3")], outages: 0 },
+    { id: 4, name: "Agence Angers Lac", ref: "INC" + seq++, r5g: 3, open: false, hosts: [host("10.20.5.1"), host("10.20.5.2")], outages: 0 },
+    { id: 5, name: "Agence Laval Hôtel de ville", ref: "INC" + seq++, r5g: 0, open: false, hosts: [host("10.20.8.1", "degraded")], outages: 0 },
+    { id: 6, name: "Agence Tours Nord", ref: "INC" + seq++, r5g: 0, open: false, hosts: [host("10.20.9.1"), host("10.20.9.2")], outages: 0 },
+  ];
+  let nextId = 7;
+  const stock = [
+    { name: "R5G-01", cat: "BVPN", agency: 1 }, { name: "R5G-02", cat: "FI", agency: 2 }, { name: "R5G-03", cat: "BVPN", agency: 4 },
+    { name: "R5G-04", cat: "FI", agency: null }, { name: "R5G-05", cat: "BVPN", agency: null },
+  ];
+  // Historique de départ : 40 pings déjà faits, pour ne pas ouvrir sur une liste vide.
+  agencies.forEach(a => {
+    a.downAt = null; a.upAt = null;
+    a.hosts.forEach(h => { for (let i = 0; i < 40; i++) h.pings.push(genPing(h)); h.status = hostStatus(h); h.since = now() - rand(4, 50) * 60000; });
+    const st = agencyStatus(a);
+    if (st === "down" || st === "partial") { a.downAt = now() - rand(20, 140) * 60000; a.outages = 1; }
+    if (a.id === 4) { a.downAt = now() - 190 * 60000; a.upAt = now() - 35 * 60000; a.outages = 1; }
+    a.since = Math.min(...a.hosts.map(h => h.since));
+    a.status = st;
+  });
+
+  function genPing(h) {
+    switch (h.mode) {
+      case "down": return null;
+      case "flap": return Math.random() < 0.45 ? null : rand(14, 45);
+      case "degraded": return Math.random() < 0.12 ? null : rand(140, 420);
+      default: return Math.random() < 0.01 ? null : rand(9, 38);
+    }
+  }
+  function hostStatus(h) {
+    const p = h.pings, last = p.slice(-4);
+    if (last.length >= 4 && last.every(v => v === null)) return "down";
+    const win = p.slice(-20);
+    let flips = 0; for (let i = 1; i < win.length; i++) if ((win[i] === null) !== (win[i - 1] === null)) flips++;
+    if (flips >= 6) return "flap";
+    const ok = win.filter(v => v !== null), loss = 1 - ok.length / Math.max(win.length, 1);
+    const avg = ok.reduce((a, b) => a + b, 0) / Math.max(ok.length, 1);
+    if (loss > 0.08 || avg > 120) return "degraded";
+    return win.length < 3 ? "pending" : "up";
+  }
+  function agencyStatus(a) {
+    const s = a.hosts.map(h => h.status), down = s.filter(x => x === "down").length;
+    if (down === s.length) return "down";
+    if (down) return "partial";
+    for (const k of ["flap", "degraded"]) if (s.includes(k)) return k;
+    return s.every(x => x === "up") ? "up" : "pending";
+  }
+
+  const logEl = document.getElementById("log");
+  function log(msg) {
+    const d = document.createElement("div");
+    d.textContent = clock(now()) + "  " + msg;
+    logEl.prepend(d);
+    while (logEl.children.length > 30) logEl.lastChild.remove();
+  }
+  const toastEl = document.getElementById("toast");
+  let toastT;
+  function toast(msg) { toastEl.textContent = msg; toastEl.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => toastEl.hidden = true, 4200); }
+
+  function tick() {
+    agencies.forEach(a => {
+      a.hosts.forEach(h => {
+        h.pings.push(genPing(h)); if (h.pings.length > WINDOW) h.pings.shift();
+        const st = hostStatus(h);
+        if (st !== h.status) { h.status = st; h.since = now(); }
+      });
+      const st = agencyStatus(a);
+      if (st !== a.status) {
+        const wasDown = a.status === "down" || a.status === "partial", isDown = st === "down" || st === "partial";
+        if (isDown && !wasDown) { a.downAt = now(); a.upAt = null; a.outages++; log(a.name + " : coupure détectée (" + STATUS[st][0] + ")"); }
+        if (!isDown && wasDown && st === "up") { a.upAt = now(); log(a.name + " : toutes les adresses répondent, agence remontée"); }
+        if (st === "flap") log(a.name + " : bagot détecté");
+        a.status = st; a.since = now();
+      }
+    });
+    render();
+  }
+
+  // Événements aléatoires pour que la démo vive toute seule.
+  function randomEvent() {
+    const a = agencies[Math.floor(Math.random() * agencies.length)];
+    const h = a.hosts[Math.floor(Math.random() * a.hosts.length)];
+    const next = { up: ["down", "flap", "degraded"], down: ["up", "up", "flap"], flap: ["up", "down"], degraded: ["up", "up", "down"] }[h.mode];
+    h.mode = next[Math.floor(Math.random() * next.length)];
+  }
+
+  const rowsEl = document.getElementById("rows");
+  const filterEl = document.getElementById("filter");
+  function statusCell(st, a) {
+    let txt = STATUS[st][0];
+    // Comme dans l'application : « KO 1/3 » = 1 adresse sur 3 ne répond pas.
+    if (a && a.hosts.length > 1) {
+      const n = a.hosts.length, down = a.hosts.filter(h => h.status === "down").length;
+      if (st === "down" || st === "partial") txt = "KO " + down + "/" + n;
+      else if (st === "up") txt = "OK " + n + "/" + n;
+    }
+    return '<span class="st" style="--c:' + STATUS[st][1] + '">' + esc(txt) + "</span>";
+  }
+  function timeline(pings) {
+    return '<span class="timeline" aria-hidden="true">' + pings.slice(-40).map(v =>
+      v === null ? '<i style="height:16px;background:var(--down)"></i>' :
+      '<i style="height:' + Math.max(4, Math.min(16, v / 25 + 4)).toFixed(0) + 'px;background:' + (v > 120 ? "var(--degraded)" : "var(--up)") + '"></i>').join("") + "</span>";
+  }
+  function stats(pings) {
+    const ok = pings.slice(-20).filter(v => v !== null), last = pings[pings.length - 1];
+    return { rtt: last == null ? "—" : last.toFixed(0) + " ms", loss: (100 - ok.length / Math.max(pings.slice(-20).length, 1) * 100).toFixed(0) + " %" };
+  }
+  function render() {
+    const q = filterEl.value.trim().toLowerCase();
+    const list = agencies.filter(a => !q || a.name.toLowerCase().includes(q) || a.ref.toLowerCase().includes(q) || a.hosts.some(h => h.ip.includes(q)))
+      .sort((x, y) => STATUS[x.status][2] - STATUS[y.status][2] || x.name.localeCompare(y.name));
+    let html = "";
+    list.forEach(a => {
+      const multi = a.hosts.length > 1, single = a.hosts[0];
+      const s = multi ? stats(a.hosts.flatMap(h => h.pings.slice(-1)).concat(a.hosts[0].pings)) : stats(single.pings);
+      const tint = { down: "t-down", partial: "t-partial", flap: "t-flap" }[a.status] || "";
+      html += '<tr class="' + tint + '">' +
+        "<td>" + statusCell(a.status, a) + "</td>" +
+        '<td class="lbl">' + (multi ? '<button class="tw" data-toggle="' + a.id + '" aria-expanded="' + a.open + '" aria-label="' + (a.open ? "Replier" : "Déplier") + " " + esc(a.name) + '">' + (a.open ? "▼" : "▶") + "</button>" : '<span class="tw"></span>') +
+          "<strong>" + esc(a.name) + "</strong>" + (multi ? "" : ' <span class="note mono">' + esc(single.ip) + "</span>") + "</td>" +
+        '<td><a class="ref" href="#" data-ref="' + esc(a.ref) + '">' + esc(a.ref) + "</a></td>" +
+        '<td><button class="r5g ' + R5G[a.r5g][1] + '" data-r5g="' + a.id + '">' + R5G[a.r5g][0] + "</button></td>" +
+        '<td class="num">' + dur(now() - a.since) + "</td>" +
+        '<td class="mono">' + clock(a.downAt) + "</td>" +
+        '<td class="mono">' + clock(a.upAt) + "</td>" +
+        "<td>" + (multi ? "" : timeline(single.pings)) + "</td>" +
+        '<td class="num">' + (multi ? "" : s.rtt) + "</td>" +
+        '<td class="num">' + (multi ? "" : s.loss) + "</td>" +
+        '<td class="num">' + a.outages + "</td></tr>";
+      if (multi && a.open) a.hosts.forEach(h => {
+        const hs = stats(h.pings);
+        html += '<tr class="child"><td>' + statusCell(h.status) + '</td><td class="lbl">' + esc(h.ip) + "</td><td></td><td></td>" +
+          '<td class="num">' + dur(now() - h.since) + "</td><td></td><td></td><td>" + timeline(h.pings) + '</td><td class="num">' + hs.rtt +
+          '</td><td class="num">' + hs.loss + "</td><td></td></tr>";
+      });
+    });
+    rowsEl.innerHTML = html || '<tr><td colspan="11" class="empty">Aucune agence ne correspond au filtre.</td></tr>';
+    const c = k => agencies.filter(a => a.status === k).length;
+    document.getElementById("summary").innerHTML =
+      "<span><b>" + agencies.length + "</b> agences suivies</span><span><b>" + (c("down") + c("partial")) + "</b> en coupure</span><span><b>" + c("flap") +
+      "</b> en bagot</span><span><b>" + c("up") + "</b> OK</span><span><b>" + agencies.filter(a => a.r5g === 2).length + "</b> routeur(s) 5G en place</span>";
+  }
+  function renderStock() {
+    const name = id => (agencies.find(a => a.id === id) || {}).name || "—";
+    document.getElementById("stockRows").innerHTML = stock.map(r => {
+      const a = agencies.find(x => x.id === r.agency);
+      const st = !a ? "En stock" : R5G[a.r5g][0] === "Aucun" ? "En stock" : R5G[a.r5g][0];
+      return "<tr><td class='mono'>" + esc(r.name) + "</td><td>" + r.cat + "</td><td>" + st + "</td><td>" + esc(a && st !== "En stock" ? name(r.agency) : "—") + "</td><td class='mono'>" + new Date(now() - 86400000 * (2 + stock.indexOf(r))).toLocaleDateString("fr-FR") + "</td></tr>";
+    }).join("");
+  }
+
+  rowsEl.addEventListener("click", e => {
+    const t = e.target.closest("[data-toggle],[data-r5g],[data-ref]");
+    if (!t) return;
+    e.preventDefault();
+    if (t.dataset.toggle) { const a = agencies.find(x => x.id === +t.dataset.toggle); a.open = !a.open; }
+    if (t.dataset.r5g) {
+      const a = agencies.find(x => x.id === +t.dataset.r5g); a.r5g = (a.r5g + 1) % R5G.length;
+      if (a.r5g && !stock.some(r => r.agency === a.id)) { const free = stock.find(r => !r.agency); if (free) free.agency = a.id; }
+      if (!a.r5g) stock.forEach(r => { if (r.agency === a.id) r.agency = null; });
+      log(a.name + " : routeur 5G « " + R5G[a.r5g][0] + " »");
+    }
+    if (t.dataset.ref) toast("Dans l'application, ce lien ouvre le ticket " + t.dataset.ref + " dans l'outil de suivi.");
+    render(); renderStock();
+  });
+
+  document.getElementById("addForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const ip = document.getElementById("addIp").value.trim(), nameIn = document.getElementById("addName").value.trim();
+    if (!validIp(ip)) { toast("Saisissez une adresse IP valide, par exemple 10.20.3.4."); return; }
+    if (agencies.some(a => a.hosts.some(h => h.ip === ip))) { toast(ip + " est déjà surveillée."); return; }
+    // Règle métier : les routeurs d'une même agence ont des adresses consécutives.
+    const n = ipNum(ip), near = agencies.find(a => a.hosts.some(h => Math.abs(ipNum(h.ip) - n) === 1));
+    const h = host(ip, Math.random() < 0.5 ? "down" : "up");
+    if (near) {
+      near.hosts.push(h); near.hosts.sort((x, y) => ipNum(x.ip) - ipNum(y.ip)); near.open = true;
+      toast(ip + " rejoint « " + near.name + " » : son adresse suit celle d'un routeur de cette agence.");
+      log(ip + " ajoutée à " + near.name + " (adresses consécutives)");
+    } else {
+      const name = nameIn || "Nouvelle agence " + ip;
+      agencies.push({ id: nextId++, name, ref: "INC" + seq++, r5g: 0, open: false, hosts: [h], outages: 0, downAt: null, upAt: null, since: now(), status: "pending" });
+      toast("Nouvelle agence « " + name + " » créée : aucune adresse voisine n'est déjà suivie.");
+      log(name + " ajoutée (" + ip + ")");
+    }
+    e.target.reset(); render();
+  });
+
+  document.getElementById("cutBtn").addEventListener("click", () => {
+    const ups = agencies.filter(a => a.status === "up" || a.status === "degraded");
+    const a = ups[Math.floor(Math.random() * ups.length)] || agencies[0];
+    a.hosts.forEach(h => h.mode = "down");
+    toast("Coupure lancée sur « " + a.name + " ». Elle passe en KO après 4 pings perdus.");
+    setTimeout(() => a.hosts.forEach(h => h.mode = "up"), 25000);
+  });
+
+  let paused = false, timer;
+  const pauseBtn = document.getElementById("pauseBtn");
+  pauseBtn.addEventListener("click", () => { paused = !paused; pauseBtn.textContent = paused ? "Reprendre" : "Pause"; pauseBtn.setAttribute("aria-pressed", paused); });
+  filterEl.addEventListener("input", render);
+  document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") { e.preventDefault(); filterEl.focus(); } });
+
+  const tabs = { tabList: "panelList", tabStock: "panelStock" };
+  Object.keys(tabs).forEach(id => document.getElementById(id).addEventListener("click", () => {
+    Object.entries(tabs).forEach(([t, p]) => { document.getElementById(t).setAttribute("aria-selected", t === id); document.getElementById(p).hidden = t !== id; });
+    renderStock();
+  }));
+
+  let n = 0;
+  setInterval(() => { if (paused) return; tick(); if (++n % 9 === 0) randomEvent(); }, 1000);
+  log("Démo lancée : 6 agences fictives, un ping par seconde");
+  render(); renderStock();
+})();
+</script>
+</body>
+</html>
