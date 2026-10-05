@@ -16,22 +16,27 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout : en-tête sobre, index des projets façon sommaire, puis une fiche par projet (texte + vignette qui montre le produit). */
+/* Layout : bandeau bleu pleine largeur (comme le CV), sommaire des projets, une fiche par projet, puis le parcours en frise.
+   Mêmes polices et même bleu que le CV ; le corail marque ce qui est en cours, chaque projet garde sa couleur. */
 :root{
   --bg:#F1F2EE; --surface:#FFFFFF; --ink:#151A17; --muted:#5D655F; --line:#D9DCD4;
   --accent:#2944D6; --accent-soft:#E3E8FB; --ok:#1E8E4E; --ko:#D2412F;
+  --blue-deep:#18267A; --blue-light:#B9C6FF; --coral:#FF6B57; --coral-soft:#FFE7E2; --coral-ink:#B23A28; --tint:#F4F6FD; --on-accent:#FFFFFF;
   --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#111412; --surface:#1A1E1B; --ink:#ECEFEA; --muted:#9BA39D; --line:#2C322E;
-  --accent:#8EA2FF; --accent-soft:#232B4D; --ok:#4CC27F; --ko:#FF7563; color-scheme:dark}}
+  --accent:#8EA2FF; --accent-soft:#232B4D; --ok:#4CC27F; --ko:#FF7563;
+  --blue-light:#5B6CB8; --coral-soft:#3A221E; --coral-ink:#FF9A8A; --tint:#191E2C; --on-accent:#0E1430; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111412; --surface:#1A1E1B; --ink:#ECEFEA; --muted:#9BA39D; --line:#2C322E;
-  --accent:#8EA2FF; --accent-soft:#232B4D; --ok:#4CC27F; --ko:#FF7563; color-scheme:dark}
+  --accent:#8EA2FF; --accent-soft:#232B4D; --ok:#4CC27F; --ko:#FF7563;
+  --blue-light:#5B6CB8; --coral-soft:#3A221E; --coral-ink:#FF9A8A; --tint:#191E2C; --on-accent:#0E1430; color-scheme:dark}
 
 *{box-sizing:border-box}
+html,body{overflow-x:clip}
 body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--body);padding-inline:20px;padding-block:0 64px}
 .wrap{max-width:1080px;margin-inline:auto}
 a{color:var(--accent);text-underline-offset:3px}
@@ -40,23 +45,39 @@ h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.08}
 p{margin:0}
 .mono{font-family:var(--mono)}
 
-/* En-tête */
-header{padding-block:56px 40px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:40px;align-items:end}
-.kicker{font:500 13px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+/* En-tête : bandeau bleu pleine largeur, identique au CV (il garde ses couleurs en mode sombre) */
+.band{position:relative;overflow:hidden;color:#FFFFFF;margin-inline:calc(50% - 50vw);padding-inline:max(20px,calc(50vw - 540px));padding-block:64px 44px;
+  background:linear-gradient(120deg,#18267A 0%,#2944D6 62%,#4B63F0 100%)}
+.band::before,.band::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.band::before{width:420px;height:420px;right:-90px;top:-190px;background:rgba(255,255,255,.08)}
+.band::after{width:220px;height:220px;right:28%;bottom:-150px;background:rgba(255,107,87,.35)}
+.band-top{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end}
+.kicker{font:500 13px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#B9C6FF;margin-bottom:16px}
 h1{font-size:clamp(44px,7vw,84px);font-weight:800;letter-spacing:-.02em}
-h1 .dot{color:var(--accent)}
-.intro{font-size:18px;color:var(--muted);max-width:42ch;margin-top:18px}
-.facts{display:grid;gap:14px;font-size:14px}
-.facts div{display:grid;grid-template-columns:96px 1fr;gap:12px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
-.facts dt{font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding-top:2px}
-.facts dd{margin:0}
+h1 .dot{color:#FF6B57}
+.role{margin-top:10px;font:600 clamp(17px,2.2vw,21px)/1.3 var(--display)}
+.role span{color:#B9C6FF}
+.monogram{width:96px;height:96px;border-radius:24px;background:#FFFFFF;color:#2944D6;display:grid;place-items:center;font:800 36px/1 var(--display);letter-spacing:-.02em;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.intro{position:relative;font-size:18px;color:#E6EAFF;max-width:62ch;margin-top:18px}
+.pills{position:relative;display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.pills a{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);color:#FFFFFF;text-decoration:none;font-size:14.5px;font-weight:500;transition:background .15s}
+.pills a:hover{background:rgba(255,255,255,.24)}
+.pills a.main{background:#FFFFFF;color:#2944D6;border-color:#FFFFFF;font-weight:600}
+.pills i{font-style:normal;font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:#B9C6FF}
+.band a:focus-visible{outline:2px solid #FFFFFF;outline-offset:3px}
 dl{margin:0}
 
-/* Sommaire */
-.index{padding-block:36px 8px}
-.index h2{font-size:14px;font-family:var(--mono);font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+/* Titres de section numérotés, comme sur le CV */
+.sec-title{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;margin-bottom:18px}
+.sec-title b{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:#FFFFFF;font:600 13px/1 var(--mono);flex:none}
+.sec-title h2{font-size:clamp(28px,3.6vw,38px);font-weight:800;letter-spacing:-.015em}
+.sec-title .rule{flex:1;min-width:40px;height:1px;background:var(--line)}
+.sw{display:inline-block;width:18px;height:18px;border-radius:5px;flex:none;vertical-align:middle}
+
+/* Sommaire : chaque projet avec sa couleur */
+.index{padding-block:48px 8px;scroll-margin-top:16px}
 .index ol{list-style:none;margin:0;padding:0}
-.index li a{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr) auto;gap:16px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
+.index li a{display:grid;grid-template-columns:18px minmax(0,1.1fr) minmax(0,1.4fr) auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
 .index li a:hover .iname{color:var(--accent)}
 .iname{font:700 22px/1.2 var(--display)}
 .itype{color:var(--muted);font-size:15px}
@@ -67,16 +88,17 @@ dl{margin:0}
 .project{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:40px;padding-block:56px;border-bottom:1px solid var(--line);scroll-margin-top:16px}
 .project:nth-of-type(even) .shot{order:-1}
 .meta{display:flex;flex-wrap:wrap;gap:8px 16px;font:500 12px/1 var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
-.project h3{font-size:clamp(32px,4.4vw,46px);font-weight:800;letter-spacing:-.015em}
+.project h3{font-size:clamp(32px,4.4vw,46px);font-weight:800;letter-spacing:-.015em;display:flex;align-items:center;gap:14px}
+.project h3 .sw{width:26px;height:26px;border-radius:7px}
 .pitch{font-size:18px;margin-top:14px;max-width:46ch}
 .points{margin:22px 0 0;padding:0;list-style:none;display:grid;gap:12px;max-width:52ch}
 .points li{padding-left:20px;position:relative;color:var(--muted)}
-.points li::before{content:"";position:absolute;left:0;top:.72em;width:8px;height:2px;background:var(--accent)}
+.points li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:2px;background:var(--blue-light)}
 .points strong{color:var(--ink);font-weight:600}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:22px}
 .tags span{font:400 12.5px/1 var(--mono);padding:6px 8px;background:var(--accent-soft);color:var(--ink);border-radius:4px}
 .links{margin-top:22px;font-size:15px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
-.cta{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:6px;background:var(--accent);color:var(--surface);font-weight:600;text-decoration:none;font-size:15px}
+.cta{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent);font-weight:600;text-decoration:none;font-size:15px}
 .cta:hover{filter:brightness(1.08)}
 .cta::after{content:"→";transition:transform .15s}
 .cta:hover::after{transform:translateX(3px)}
@@ -176,40 +198,58 @@ dl{margin:0}
 .human{font:400 12.5px/1.4 var(--body);background:#E9EDF2;color:#3A4656;border:1px solid #C6CEDA;padding:10px 12px;border-radius:4px;max-width:30ch}
 .human b{display:block;font-weight:600;margin-bottom:2px}
 
-/* Parcours : expérience à gauche (la plus longue), formation et contact à droite */
-.cv{padding-block:64px 8px}
-.cv-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px 24px;margin-bottom:28px}
-.cv-head h2{font-size:clamp(32px,4.4vw,46px);font-weight:800;letter-spacing:-.015em}
+/* Parcours : frise comme sur le CV (expérience, formation), compétences et contact à droite */
+.cv{padding-block:64px 8px;scroll-margin-top:16px}
+.cv .sec-title .cta{margin-left:auto}
 .cv-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px}
-.cv h3.col{font:500 13px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:4px}
-.step{display:grid;grid-template-columns:118px minmax(0,1fr);gap:16px;padding-block:18px;border-bottom:1px dashed var(--line)}
-.step .when{font:400 13px/1.45 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
-.step h4{margin:0;font:700 19px/1.2 var(--display);letter-spacing:-.01em;text-wrap:balance}
-.step .org{margin-top:4px;font-weight:500}
+.sub{display:flex;align-items:center;gap:10px;font:700 20px/1.2 var(--display);margin:8px 0 18px}
+.sub i{width:12px;height:12px;border-radius:3px}
+.timeline{position:relative;display:grid;gap:26px;padding-left:28px;margin-bottom:40px}
+.timeline::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:3px;border-radius:3px;background:linear-gradient(var(--accent),var(--accent-soft))}
+.step{position:relative}
+.step::before{content:"";position:absolute;left:-28px;top:4px;width:15px;height:15px;border-radius:50%;background:var(--bg);border:3px solid var(--accent);box-sizing:border-box}
+.step.now::before{background:var(--coral);border-color:var(--coral);box-shadow:0 0 0 5px rgba(255,107,87,.22)}
+.date{display:inline-block;font:500 12.5px/1 var(--mono);padding:6px 9px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.step.now .date{background:var(--coral-soft);color:var(--coral-ink)}
+.step h4{margin:10px 0 0;font:700 20px/1.2 var(--display);letter-spacing:-.01em;text-wrap:balance}
+.step .org{margin-top:4px;font-weight:600;color:var(--accent)}
 .step .org span{color:var(--muted);font-weight:400}
 .step .points{margin-top:10px;gap:6px}
 .step .points a{color:var(--ink);font-weight:600}
-.side{display:grid;gap:36px;align-content:start}
-.contact{display:grid;gap:10px;margin-top:14px}
+.side{display:grid;gap:32px;align-content:start}
+.card{background:var(--tint);border:1px solid var(--line);border-radius:14px;padding:20px}
+.skill-group + .skill-group{margin-top:16px}
+.skill-group p{font:500 11.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.card .tags{margin-top:0}
+.card .tags span{background:var(--surface);border:1px solid var(--line)}
+.card .tags.t-front span{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.card .tags.t-back span{background:var(--accent-soft);border-color:var(--accent-soft)}
+.contact{display:grid;gap:10px}
 .contact div{display:grid;grid-template-columns:82px minmax(0,1fr);gap:12px;align-items:baseline}
 .contact dt{font:400 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .contact dd{margin:0;overflow-wrap:anywhere}
 .contact a{color:var(--ink)}
-.side .tags{margin-top:14px}
-.hello{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:20px;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{font-size:14px;padding:6px 12px;border-radius:999px;background:var(--coral-soft);color:var(--coral-ink)}
+.chips.lang span{background:var(--accent-soft);color:var(--accent)}
 @media (max-width:820px){
-  .cv-grid{grid-template-columns:1fr;gap:40px}
-  .step{grid-template-columns:1fr;gap:6px}
+  .cv-grid{grid-template-columns:1fr;gap:16px}
+  .cv .sec-title .cta{margin-left:0}
 }
 
 footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;color:var(--muted);font-size:14px}
 
 @media (max-width:820px){
-  header{grid-template-columns:1fr;gap:28px;padding-block:40px 32px}
+  .band{padding-block:44px 32px}
+  .band-top{grid-template-columns:1fr}
+  .monogram{display:none}
+  .index li a{grid-template-columns:18px minmax(0,1fr) auto;row-gap:4px}
+  .index li .sw{grid-column:1;grid-row:1}
+  .iname{grid-column:2;grid-row:1}
+  .istat{grid-column:3;grid-row:1}
+  .itype{grid-column:2/-1;grid-row:2}
   .project{grid-template-columns:1fr;gap:28px;padding-block:44px}
   .project:nth-of-type(even) .shot{order:0}
-  .index li a{grid-template-columns:minmax(0,1fr) auto}
-  .itype{grid-column:1/-1;grid-row:2}
 }
 @media (max-width:460px){
   .erp-ca div{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -232,31 +272,36 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 </head>
 <body>
 <div class="wrap">
-<header>
-  <div>
-    <p class="kicker">Développeur web, mobile et desktop</p>
-    <h1>Tom Poyeau<span class="dot">.</span></h1>
-    <p class="intro">Je conçois des outils qui servent pour de vrai : une app de planning utilisée par mon équipe, un utilitaire réseau en production, un launcher de jeux mis à jour automatiquement, et des sites prêts à vendre.</p>
-    <p class="hello"><a href="#parcours">Mon parcours</a><a href="/cv-tom-poyeau.pdf" target="_blank" rel="noopener">CV en PDF</a><a href="mailto:tompoyeau@hotmail.fr">tompoyeau@hotmail.fr</a></p>
+<header class="band">
+  <div class="band-top">
+    <div>
+      <p class="kicker">Portfolio · 2026</p>
+      <h1>Tom Poyeau<span class="dot">.</span></h1>
+      <p class="role">Développeur web, mobile et desktop <span>·</span> Technicien support informatique</p>
+    </div>
+    <div class="monogram" aria-hidden="true">TP</div>
   </div>
-  <dl class="facts">
-    <div><dt>Front</dt><dd>Vue 3, React Native, TypeScript, Tailwind</dd></div>
-    <div><dt>Back</dt><dd>Firebase, Cloud Functions, Node / Express, Cloudflare Workers</dd></div>
-    <div><dt>Desktop</dt><dd>Tauri 2 (Rust), Python / PySide6</dd></div>
-    <div><dt>Livraison</dt><dd>GitHub Actions, GitHub Pages, auto-update, PWA</dd></div>
-  </dl>
+  <p class="intro">Je conçois des outils qui servent pour de vrai : une app de planning utilisée par mon équipe, un utilitaire réseau en production, un launcher de jeux mis à jour automatiquement, et des sites prêts à vendre.</p>
+  <p class="pills">
+    <a class="main" href="#projets">7 projets à essayer</a>
+    <a href="#parcours">Mon parcours</a>
+    <a href="/cv-tom-poyeau.pdf" target="_blank" rel="noopener"><i>PDF</i>Mon CV</a>
+    <a href="mailto:tompoyeau@hotmail.fr"><i>E-mail</i>tompoyeau@hotmail.fr</a>
+    <a href="tel:+33763275088"><i>Tél.</i>07 63 27 50 88</a>
+    <a href="https://github.com/tompoyeau" target="_blank" rel="noopener"><i>GitHub</i>tompoyeau</a>
+  </p>
 </header>
 
-<nav class="index" aria-label="Projets">
-  <h2>7 projets, tous à essayer dans le navigateur</h2>
+<nav class="index" id="projets" aria-label="Projets">
+  <div class="sec-title"><b style="background:#2944D6">01</b><h2>Projets à essayer</h2><span class="rule"></span></div>
   <ol>
-    <li><a href="#torii"><span class="iname">Torii</span><span class="itype">Launcher de jeux pour Windows</span><span class="istat live">À essayer</span></a></li>
-    <li><a href="#bloom"><span class="iname">Bloom</span><span class="itype">App mobile pour fêter un proche à plusieurs</span><span class="istat live">À essayer</span></a></li>
-    <li><a href="#resto"><span class="iname">Sites restaurant</span><span class="itype">Template + outil de revente clé en main</span><span class="istat live">À essayer</span></a></li>
-    <li><a href="#pingwatch"><span class="iname">PingWatch</span><span class="itype">Supervision des sites en panne réseau</span><span class="istat live">À essayer</span></a></li>
-    <li><a href="#helio"><span class="iname">Hélio</span><span class="itype">Planning et statistiques d'une équipe support</span><span class="istat live">À essayer</span></a></li>
-    <li><a href="#picsou"><span class="iname">Picsou</span><span class="itype">Pilotage d'une agence de conseil : missions, CA, marge</span><span class="istat live">À essayer</span></a></li>
-    <li><a href="#truffe"><span class="iname">La Truffe Gourmande</span><span class="itype">E-commerce de pâtisseries pour chiens</span><span class="istat live">À visiter</span></a></li>
+    <li><a href="#torii"><span class="sw" style="background:linear-gradient(135deg,#FF6B57,#7A2C6E)"></span><span class="iname">Torii</span><span class="itype">Launcher de jeux pour Windows</span><span class="istat live">À essayer</span></a></li>
+    <li><a href="#bloom"><span class="sw" style="background:#E2477F"></span><span class="iname">Bloom</span><span class="itype">App mobile pour fêter un proche à plusieurs</span><span class="istat live">À essayer</span></a></li>
+    <li><a href="#resto"><span class="sw" style="background:linear-gradient(135deg,#9C6A45,#E0A84A)"></span><span class="iname">Sites restaurant</span><span class="itype">Template + outil de revente clé en main</span><span class="istat live">À essayer</span></a></li>
+    <li><a href="#pingwatch"><span class="sw" style="background:linear-gradient(135deg,#2E9E5B,#1B2230)"></span><span class="iname">PingWatch</span><span class="itype">Supervision des sites en panne réseau</span><span class="istat live">À essayer</span></a></li>
+    <li><a href="#helio"><span class="sw" style="background:linear-gradient(135deg,#0F1B2D 50%,#FFC94D 50%)"></span><span class="iname">Hélio</span><span class="itype">Planning et statistiques d'une équipe support</span><span class="istat live">À essayer</span></a></li>
+    <li><a href="#picsou"><span class="sw" style="background:linear-gradient(135deg,#6B47A0,#E8465A)"></span><span class="iname">Picsou</span><span class="itype">Pilotage d'une agence de conseil : missions, CA, marge</span><span class="istat live">À essayer</span></a></li>
+    <li><a href="#truffe"><span class="sw" style="background:linear-gradient(135deg,#F2C14E,#3B2414)"></span><span class="iname">La Truffe Gourmande</span><span class="itype">E-commerce de pâtisseries pour chiens</span><span class="istat live">À visiter</span></a></li>
   </ol>
 </nav>
 
@@ -265,7 +310,7 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 <section class="project" id="torii">
   <div>
     <p class="meta"><span>Application desktop</span><span>Depuis août 2026</span></p>
-    <h3>Torii</h3>
+    <h3><span class="sw" style="background:linear-gradient(135deg,#FF6B57,#7A2C6E)" aria-hidden="true"></span>Torii</h3>
     <p class="pitch">Une seule bibliothèque pour tous les jeux d'un PC, qu'ils viennent de Steam, Epic, GOG, Ubisoft, Riot ou d'ailleurs.</p>
     <ul class="points">
       <li><strong>Connexion aux comptes</strong> pour récupérer les jeux possédés, le temps de jeu, les succès et les amis Steam.</li>
@@ -290,7 +335,7 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 <section class="project" id="bloom">
   <div>
     <p class="meta"><span>Application mobile</span><span>Depuis juillet 2026</span></p>
-    <h3>Bloom</h3>
+    <h3><span class="sw" style="background:#E2477F" aria-hidden="true"></span>Bloom</h3>
     <p class="pitch">Organiser l'anniversaire d'un ami à plusieurs, sans qu'il voie la surprise arriver.</p>
     <ul class="points">
       <li><strong>Deux espaces par soirée</strong> : un groupe avec la personne fêtée, et un espace surprise dont elle est exclue par les règles de sécurité de la base.</li>
@@ -321,7 +366,7 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 <section class="project" id="resto">
   <div>
     <p class="meta"><span>Produit à vendre</span><span>2026</span></p>
-    <h3>Sites restaurant clé en main</h3>
+    <h3><span class="sw" style="background:linear-gradient(135deg,#9C6A45,#E0A84A)" aria-hidden="true"></span>Sites restaurant clé en main</h3>
     <p class="pitch">Un site par restaurant, monté en quelques minutes, avec des modules facturés à la carte.</p>
     <ul class="points">
       <li><strong>Un template unique</strong> (menu, réservations, etc.) décliné pour chaque client avec son propre hébergement.</li>
@@ -350,7 +395,7 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 <section class="project" id="pingwatch">
   <div>
     <p class="meta"><span>Utilitaire Windows</span><span>Depuis septembre 2026</span></p>
-    <h3>PingWatch</h3>
+    <h3><span class="sw" style="background:linear-gradient(135deg,#2E9E5B,#1B2230)" aria-hidden="true"></span>PingWatch</h3>
     <p class="pitch">Suivre en direct les sites d'une entreprise qui ont perdu leur connexion internet, jusqu'à leur retour.</p>
     <ul class="points">
       <li><strong>Regroupement automatique par site</strong> : les adresses consécutives d'un même site sont réunies, avec un état global (« KO partiel 1/3 »).</li>
@@ -376,7 +421,7 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 <section class="project" id="helio">
   <div>
     <p class="meta"><span>Application web interne</span><span>2026</span></p>
-    <h3>Hélio</h3>
+    <h3><span class="sw" style="background:linear-gradient(135deg,#0F1B2D 50%,#FFC94D 50%)" aria-hidden="true"></span>Hélio</h3>
     <p class="pitch">Le planning et les statistiques d'activité d'une équipe support, au même endroit.</p>
     <ul class="points">
       <li><strong>Planning de la journée</strong> par personne et par activité, avec une base de test séparée pour les administrateurs.</li>
@@ -407,7 +452,7 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 <section class="project" id="picsou">
   <div>
     <p class="meta"><span>Alternance · développeur full-stack</span><span>2023-2024</span></p>
-    <h3>Picsou</h3>
+    <h3><span class="sw" style="background:linear-gradient(135deg,#6B47A0,#E8465A)" aria-hidden="true"></span>Picsou</h3>
     <p class="pitch">Piloter l'activité d'une agence de conseil : qui travaille sur quelle mission, ce que ça rapporte et ce que ça coûte.</p>
     <ul class="points">
       <li><strong>Collaborateurs et clients</strong> : postes, managers, missions, TJM facturé et PRU (coût de revient), avec tout leur historique.</li>
@@ -438,7 +483,7 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 <section class="project" id="truffe">
   <div>
     <p class="meta"><span>Site e-commerce</span><span>Août 2026</span></p>
-    <h3>La Truffe Gourmande</h3>
+    <h3><span class="sw" style="background:linear-gradient(135deg,#F2C14E,#3B2414)" aria-hidden="true"></span>La Truffe Gourmande</h3>
     <p class="pitch">Une pâtisserie pour chiens du Mans dont le site s'adresse directement au chien.</p>
     <ul class="points">
       <li><strong>Le visiteur, c'est le chien</strong> : on le tutoie, l'humain n'est qu'un « porte-carte avec des pouces ».</li>
@@ -466,16 +511,13 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 </main>
 
 <section class="cv" id="parcours" aria-labelledby="parcours-titre">
-  <div class="cv-head">
-    <h2 id="parcours-titre">Parcours</h2>
-    <a class="cta" href="/cv-tom-poyeau.pdf" target="_blank" rel="noopener">Télécharger mon CV (PDF)</a>
-  </div>
+  <div class="sec-title"><b style="background:#FF6B57">02</b><h2 id="parcours-titre">Parcours</h2><span class="rule"></span><a class="cta" href="/cv-tom-poyeau.pdf" target="_blank" rel="noopener">Télécharger mon CV (PDF)</a></div>
   <div class="cv-grid">
     <div>
-      <h3 class="col">Expérience</h3>
-      <div class="step">
-        <p class="when">Avril 2025<br>→ aujourd'hui</p>
-        <div>
+      <h3 class="sub"><i style="background:#2944D6"></i>Expérience</h3>
+      <div class="timeline">
+        <div class="step now">
+          <span class="date">Avril 2025 → aujourd'hui</span>
           <h4>Technicien support informatique (helpdesk)</h4>
           <p class="org">Apside, pour le client Covéa <span>· Le Mans</span></p>
           <ul class="points">
@@ -485,10 +527,8 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
             <li>Création d'outils pour l'équipe : <a href="#helio">Hélio</a> et <a href="#pingwatch">PingWatch</a>.</li>
           </ul>
         </div>
-      </div>
-      <div class="step">
-        <p class="when">Sept. 2022<br>→ sept. 2024</p>
-        <div>
+        <div class="step">
+          <span class="date">Sept. 2022 → sept. 2024</span>
           <h4>Développeur full-stack en alternance</h4>
           <p class="org">SII <span>· Le Mans</span></p>
           <ul class="points">
@@ -497,10 +537,8 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
             <li>Documentation technique pour la maintenance et la formation des utilisateurs.</li>
           </ul>
         </div>
-      </div>
-      <div class="step">
-        <p class="when">Sept. 2021<br>→ sept. 2022</p>
-        <div>
+        <div class="step">
+          <span class="date">Sept. 2021 → sept. 2022</span>
           <h4>Développeur full-stack en alternance</h4>
           <p class="org">Distrimob <span>· Sablé-sur-Sarthe</span></p>
           <ul class="points">
@@ -509,17 +547,27 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
           </ul>
         </div>
       </div>
+
+      <h3 class="sub"><i style="background:#FF6B57"></i>Formation</h3>
+      <div class="timeline">
+        <div class="step"><span class="date">2022 → 2024</span><h4>Master Ingénieur informatique, option Lead Developer</h4><p class="org">Institut d'Informatique Appliquée <span>· Laval</span></p></div>
+        <div class="step"><span class="date">2021 → 2022</span><h4>Bachelor Responsable en ingénierie des logiciels</h4><p class="org">CESI <span>· Le Mans</span></p></div>
+        <div class="step"><span class="date">2019 → 2021</span><h4>BTS SIO, option SLAM</h4><p class="org">Lycée André Malraux <span>· Allonnes</span></p></div>
+      </div>
     </div>
 
     <div class="side">
       <div>
-        <h3 class="col">Formation</h3>
-        <div class="step"><p class="when">2022 → 2024</p><div><h4>Master Ingénieur informatique, option Lead Developer</h4><p class="org">Institut d'Informatique Appliquée <span>· Laval</span></p></div></div>
-        <div class="step"><p class="when">2021 → 2022</p><div><h4>Bachelor Responsable en ingénierie des logiciels</h4><p class="org">CESI <span>· Le Mans</span></p></div></div>
-        <div class="step"><p class="when">2019 → 2021</p><div><h4>BTS SIO, option SLAM</h4><p class="org">Lycée André Malraux <span>· Allonnes</span></p></div></div>
+        <h3 class="sub"><i style="background:#1E8E4E"></i>Compétences</h3>
+        <div class="card">
+          <div class="skill-group"><p>Front</p><div class="tags t-front"><span>Vue 3</span><span>Angular</span><span>React Native</span><span>TypeScript</span><span>Tailwind</span><span>HTML / CSS</span></div></div>
+          <div class="skill-group"><p>Back et données</p><div class="tags t-back"><span>Node / Express</span><span>Java Spring</span><span>PHP / Symfony</span><span>PostgreSQL</span><span>Firebase</span><span>Cloudflare Workers</span></div></div>
+          <div class="skill-group"><p>Desktop et livraison</p><div class="tags"><span>Tauri 2 (Rust)</span><span>Python / PySide6</span><span>GitHub Actions</span><span>Auto-update</span><span>PWA</span></div></div>
+          <div class="skill-group"><p>Support</p><div class="tags"><span>Diagnostic</span><span>Matériel et logiciels</span><span>Réseau</span><span>Formation</span></div></div>
+        </div>
       </div>
       <div>
-        <h3 class="col">Contact</h3>
+        <h3 class="sub"><i style="background:#8E44AD"></i>Contact</h3>
         <dl class="contact">
           <div><dt>E-mail</dt><dd><a href="mailto:tompoyeau@hotmail.fr">tompoyeau@hotmail.fr</a></dd></div>
           <div><dt>Téléphone</dt><dd><a href="tel:+33763275088">07 63 27 50 88</a></dd></div>
@@ -528,8 +576,9 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
         </dl>
       </div>
       <div>
-        <h3 class="col">Aussi</h3>
-        <div class="tags"><span>Java Spring</span><span>Angular</span><span>PHP / Symfony</span><span>Anglais</span><span>Escalade</span><span>Musique</span><span>Jeux vidéo</span></div>
+        <h3 class="sub"><i style="background:#E08E0B"></i>En dehors du code</h3>
+        <div class="chips lang"><span>Français</span><span>Anglais</span></div>
+        <div class="chips" style="margin-top:8px"><span>Jeux vidéo</span><span>Escalade</span><span>Musique</span></div>
       </div>
     </div>
   </div>
