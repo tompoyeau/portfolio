@@ -7,170 +7,196 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* CV d'une page A4, même direction artistique que topo-host.com : papier gris-vert, encre presque noire,
-   accent bleu, titres Bricolage Grotesque, texte IBM Plex Sans, dates et libellés en IBM Plex Mono. */
+/* CV A4 d'une page, dans la direction artistique de topo-host.com (Bricolage Grotesque, IBM Plex, bleu #2944D6),
+   en plus coloré : bandeau bleu, frise chronologique, et les couleurs propres à chaque projet du portfolio. */
 :root{
-  --bg:#FFFFFF; --side:#F1F2EE; --ink:#151A17; --muted:#5D655F; --line:#D9DCD4; --accent:#2944D6; --accent-soft:#E3E8FB;
+  --ink:#151A17; --muted:#5D655F; --line:#DCE0EA; --paper:#FFFFFF; --tint:#F4F6FD;
+  --blue:#2944D6; --blue-deep:#18267A; --blue-soft:#E3E8FB; --blue-light:#B9C6FF; --coral:#FF6B57;
   --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
   --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
   --mono:"IBM Plex Mono",Consolas,ui-monospace,monospace;
 }
 @page{size:A4;margin:0}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:400 9.4pt/1.45 var(--body);-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.page{width:210mm;height:297mm;grid-template-rows:297mm;display:grid;grid-template-columns:1fr 69mm;overflow:hidden}
-main{padding:14mm 9mm 10mm 13mm;display:flex;flex-direction:column;gap:5.5mm}
-aside{background:var(--side);padding:14mm 9mm 10mm 8mm;display:flex;flex-direction:column;gap:6mm;border-left:1px solid var(--line)}
-h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:400 9.1pt/1.42 var(--body);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+h1,h2,h3,h4{font-family:var(--display);margin:0;line-height:1.05}
 p{margin:0}
 a{color:inherit;text-decoration:none}
 
-/* En-tête */
-.kicker{font:500 7.6pt/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3mm}
-h1{font-size:30pt;font-weight:800;letter-spacing:-.02em}
-h1 .dot{color:var(--accent)}
-.role{margin-top:2.2mm;font:600 11.5pt/1.3 var(--display);color:var(--accent)}
-.intro{margin-top:3mm;color:var(--muted);font-size:9.6pt;max-width:118mm}
+/* ---- Bandeau ---- */
+.band{position:relative;overflow:hidden;color:#FFFFFF;padding:9mm 9mm 6.5mm 13mm;
+  background:linear-gradient(120deg,var(--blue-deep) 0%,var(--blue) 62%,#4B63F0 100%)}
+.band::before,.band::after{content:"";position:absolute;border-radius:50%}
+.band::before{width:78mm;height:78mm;right:-18mm;top:-34mm;background:rgba(255,255,255,.08)}
+.band::after{width:40mm;height:40mm;right:38mm;bottom:-26mm;background:rgba(255,107,87,.35)}
+.band-top{position:relative;display:grid;grid-template-columns:1fr auto;gap:6mm;align-items:end}
+.kicker{font:500 7.4pt/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--blue-light);margin-bottom:2.6mm}
+h1{font-size:31pt;font-weight:800;letter-spacing:-.02em}
+h1 .dot{color:var(--coral)}
+.role{margin-top:2mm;font:600 11pt/1.3 var(--display)}
+.role span{color:var(--blue-light);font-weight:600}
+.monogram{width:20mm;height:20mm;border-radius:5mm;background:#FFFFFF;color:var(--blue);display:grid;place-items:center;font:800 17pt/1 var(--display);letter-spacing:-.02em;box-shadow:0 2mm 6mm rgba(0,0,0,.18)}
+.intro{position:relative;margin-top:3mm;max-width:150mm;color:#E6EAFF;font-size:9pt;line-height:1.4}
+.contacts{position:relative;margin-top:4mm;display:flex;flex-wrap:wrap;gap:1.3mm}
+.contacts span{display:inline-flex;align-items:center;gap:1.6mm;padding:1.3mm 1.8mm;border-radius:10mm;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);font:500 7.3pt/1 var(--body);white-space:nowrap}
+.contacts i{font-style:normal;font:500 6.2pt/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--blue-light)}
 
-/* Sections */
-h2{font:500 7.6pt/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-bottom:2mm;border-bottom:1px solid var(--line);margin-bottom:3mm}
-.item{display:grid;grid-template-columns:23mm 1fr;gap:3mm;padding-block:1.9mm}
-.item + .item{border-top:1px dashed var(--line)}
-.when{font:400 7.6pt/1.35 var(--mono);color:var(--muted);padding-top:.6mm}
-.what h3{font-size:11pt;font-weight:800;letter-spacing:-.01em}
-.org{margin-top:.8mm;font-weight:500;font-size:8.8pt}
+/* ---- Corps ---- */
+.body{display:grid;grid-template-columns:1fr 68mm;gap:7mm;padding:7mm 11mm 6mm 13mm;min-height:0}
+.main,.side{display:flex;flex-direction:column;gap:5mm;min-width:0}
+.sec-title{display:flex;align-items:center;gap:2.4mm;margin-bottom:2.6mm}
+.sec-title b{width:6.2mm;height:6.2mm;border-radius:1.6mm;display:grid;place-items:center;color:#FFFFFF;font:600 7pt/1 var(--mono)}
+.sec-title h2{font-size:12.5pt;font-weight:800;letter-spacing:-.01em}
+.sec-title::after{content:"";flex:1;height:1px;background:var(--line);margin-left:1mm}
+
+/* Frise */
+.timeline{position:relative;display:grid;gap:3.1mm;padding-left:5.5mm}
+.timeline::before{content:"";position:absolute;left:1.35mm;top:1.5mm;bottom:1.5mm;width:.5mm;background:linear-gradient(var(--blue),var(--blue-soft));border-radius:1mm}
+.step{position:relative}
+.step::before{content:"";position:absolute;left:-5.5mm;top:.9mm;width:3.2mm;height:3.2mm;border-radius:50%;background:#FFFFFF;border:.7mm solid var(--blue)}
+.step.now::before{background:var(--coral);border-color:var(--coral);box-shadow:0 0 0 1mm rgba(255,107,87,.2)}
+.date{display:inline-block;font:500 7.2pt/1 var(--mono);padding:1.2mm 1.8mm;border-radius:1.2mm;background:var(--blue-soft);color:var(--blue);white-space:nowrap}
+.step.now .date{background:#FFE7E2;color:#C2412F}
+.step h3{font-size:10.6pt;font-weight:800;letter-spacing:-.01em;margin-top:1.4mm}
+.org{margin-top:.6mm;font-weight:600;font-size:8.8pt;color:var(--blue)}
 .org span{color:var(--muted);font-weight:400}
-ul{margin:1.6mm 0 0;padding:0;list-style:none;display:grid;gap:.8mm}
-li{position:relative;padding-left:3.2mm;color:var(--muted)}
-li::before{content:"";position:absolute;left:0;top:.62em;width:1.8mm;height:.35mm;background:var(--accent)}
+ul{margin:1.4mm 0 0;padding:0;list-style:none;display:grid;gap:.6mm}
+li{position:relative;padding-left:3mm;color:var(--muted);line-height:1.36}
+li::before{content:"";position:absolute;left:0;top:.6em;width:1.4mm;height:1.4mm;border-radius:.4mm;background:var(--blue-light)}
 li strong{color:var(--ink);font-weight:600}
+.school{gap:2.2mm}
 
 /* Colonne de droite */
-.block h2{border-bottom-color:#CDD1C7}
-.contact{display:grid;gap:1.6mm;font-size:8.8pt}
-.contact div{display:grid;grid-template-columns:12mm 1fr;gap:2mm}
-.contact dt{font:400 7pt/1.5 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-.contact dd{margin:0;white-space:nowrap;font-size:8.4pt}
-dl{margin:0}
-.tags{display:flex;flex-wrap:wrap;gap:1.3mm}
-.tags span{font:400 7.6pt/1 var(--mono);padding:1.2mm 1.6mm;background:var(--accent-soft);border-radius:1mm}
-.sub{font:500 7pt/1 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:2.6mm 0 1.4mm}
-.projects{display:grid;gap:2mm}
-.projects p{font-size:8.5pt;line-height:1.35}
-.projects b{font-family:var(--display);font-weight:800;font-size:9.5pt}
-.projects .url{display:block;font:400 7pt/1.3 var(--mono);color:var(--accent)}
-.plain{font-size:8.8pt;color:var(--ink)}
-.plain span{color:var(--muted)}
+.card{background:var(--tint);border-radius:3mm;padding:3mm}
+.skill-group + .skill-group{margin-top:2.6mm}
+.skill-group p{font:500 6.8pt/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:1.4mm}
+.tags{display:flex;flex-wrap:wrap;gap:1.2mm}
+.tags span{font:500 7.5pt/1 var(--mono);padding:1.2mm 1.7mm;border-radius:1.2mm;background:#FFFFFF;border:1px solid var(--line)}
+.tags.c1 span{background:var(--blue);border-color:var(--blue);color:#FFFFFF}
+.tags.c2 span{background:var(--blue-soft);border-color:var(--blue-soft);color:var(--blue-deep)}
+.projects{display:grid;gap:1.6mm}
+.project{display:grid;grid-template-columns:7mm 1fr;gap:2.4mm;align-items:center}
+.swatch{width:7mm;height:7mm;border-radius:1.8mm}
+.project b{font:800 9.2pt/1.1 var(--display)}
+.project small{display:block;font-size:7.8pt;color:var(--muted);line-height:1.25}
+.project em{font-style:normal;font:400 6.9pt/1.2 var(--mono);color:var(--blue)}
+.chips{display:flex;flex-wrap:wrap;gap:1.2mm}
+.chips span{font-size:8pt;padding:1.1mm 2.2mm;border-radius:10mm;background:#FFF0ED;color:#9A3324}
+.chips.lang span{background:var(--blue-soft);color:var(--blue-deep)}
 </style>
 </head>
 <body>
 <div class="page">
-  <main>
-    <header>
-      <p class="kicker">Curriculum vitæ · 2026</p>
-      <h1>Tom Poyeau<span class="dot">.</span></h1>
-      <p class="role">Technicien support informatique · Développeur full-stack</p>
-      <p class="intro">Diplômé d'un Master en ingénierie informatique, spécialisé en lead développement, j'ai une double compétence : support technique d'un côté, conception et maintenance d'applications de l'autre. J'aime résoudre les problèmes complexes, former les utilisateurs et créer les outils qui simplifient leur quotidien.</p>
-    </header>
+  <header class="band">
+    <div class="band-top">
+      <div>
+        <p class="kicker">Curriculum vitæ · 2026</p>
+        <h1>Tom Poyeau<span class="dot">.</span></h1>
+        <p class="role">Technicien support informatique <span>·</span> Développeur full-stack</p>
+      </div>
+      <div class="monogram" aria-hidden="true">TP</div>
+    </div>
+    <p class="intro">Diplômé d'un Master en ingénierie informatique, spécialisé en lead développement, j'ai une double compétence : le support technique d'un côté, la conception et la maintenance d'applications de l'autre. J'aime résoudre les problèmes complexes, former les utilisateurs et créer les outils qui simplifient leur quotidien.</p>
+    <div class="contacts">
+      <span><i>E-mail</i>tompoyeau@hotmail.fr</span>
+      <span><i>Tél.</i>07 63 27 50 88</span>
+      <span>Le Mans · véhiculé</span>
+      <span>Né le 3 août 2001</span>
+      <span><i>Site</i>topo-host.com</span>
+      <span><i>GitHub</i>tompoyeau</span>
+    </div>
+  </header>
 
-    <section>
-      <h2>Expérience professionnelle</h2>
-      <div class="item">
-        <p class="when">Avr. 2025<br>→ aujourd'hui</p>
-        <div class="what">
-          <h3>Technicien support informatique (helpdesk)</h3>
-          <p class="org">Apside, pour le client Covéa <span>· Le Mans</span></p>
-          <ul>
-            <li>Diagnostic des problèmes matériels et logiciels, et mise en place de solutions adaptées.</li>
-            <li>Installation, configuration et mise à jour des équipements et des logiciels.</li>
-            <li>Escalade des incidents complexes avec les équipes techniques, en gardant l'utilisateur informé.</li>
-            <li>Création d'outils pour l'équipe : <strong>Hélio</strong> (planning et statistiques) et <strong>PingWatch</strong> (suivi des sites en panne réseau).</li>
-          </ul>
+  <div class="body">
+    <div class="main">
+      <section>
+        <div class="sec-title"><b style="background:var(--blue)">01</b><h2>Expérience</h2></div>
+        <div class="timeline">
+          <div class="step now">
+            <span class="date">Avr. 2025 → aujourd'hui</span>
+            <h3>Technicien support informatique (helpdesk)</h3>
+            <p class="org">Apside, pour le client Covéa <span>· Le Mans</span></p>
+            <ul>
+              <li>Diagnostic des problèmes matériels et logiciels, et mise en place de solutions adaptées.</li>
+              <li>Installation, configuration et mise à jour des équipements et des logiciels.</li>
+              <li>Escalade des incidents complexes avec les équipes techniques, en gardant l'utilisateur informé.</li>
+              <li>Création d'outils pour l'équipe : <strong>Hélio</strong> (planning et statistiques) et <strong>PingWatch</strong> (suivi des sites en panne réseau).</li>
+            </ul>
+          </div>
+          <div class="step">
+            <span class="date">Sept. 2022 → sept. 2024</span>
+            <h3>Développeur full-stack en alternance</h3>
+            <p class="org">SII <span>· Le Mans</span></p>
+            <ul>
+              <li>Développement et maintenance d'applications web, côté interface et côté serveur.</li>
+              <li>Intégration d'API et gestion des bases de données pour garantir la cohérence des échanges.</li>
+              <li>Documentation technique pour faciliter la maintenance et la formation des utilisateurs.</li>
+            </ul>
+          </div>
+          <div class="step">
+            <span class="date">Sept. 2021 → sept. 2022</span>
+            <h3>Développeur full-stack en alternance</h3>
+            <p class="org">Distrimob <span>· Sablé-sur-Sarthe</span></p>
+            <ul>
+              <li>Développement et maintenance d'applications web full-stack.</li>
+              <li>Gestion et optimisation des bases de données (performance et cohérence).</li>
+            </ul>
+          </div>
         </div>
-      </div>
-      <div class="item">
-        <p class="when">Sept. 2022<br>→ sept. 2024</p>
-        <div class="what">
-          <h3>Développeur full-stack en alternance</h3>
-          <p class="org">SII <span>· Le Mans</span></p>
-          <ul>
-            <li>Développement et maintenance d'applications web, côté interface et côté serveur.</li>
-            <li>Intégration d'API et gestion des bases de données pour garantir la cohérence des échanges.</li>
-            <li>Documentation technique pour faciliter la maintenance et la formation des utilisateurs.</li>
-          </ul>
+      </section>
+
+      <section>
+        <div class="sec-title"><b style="background:var(--coral)">02</b><h2>Formation</h2></div>
+        <div class="timeline school">
+          <div class="step">
+            <span class="date">2022 → 2024</span>
+            <h3>Master Ingénieur informatique, option Lead Developer</h3>
+            <p class="org">Institut d'Informatique Appliquée <span>· Laval</span></p>
+          </div>
+          <div class="step">
+            <span class="date">2021 → 2022</span>
+            <h3>Bachelor Responsable en ingénierie des logiciels</h3>
+            <p class="org">CESI <span>· Le Mans</span></p>
+          </div>
+          <div class="step">
+            <span class="date">2019 → 2021</span>
+            <h3>BTS Services informatiques aux organisations, option SLAM</h3>
+            <p class="org">Lycée André Malraux <span>· Allonnes</span></p>
+          </div>
         </div>
-      </div>
-      <div class="item">
-        <p class="when">Sept. 2021<br>→ sept. 2022</p>
-        <div class="what">
-          <h3>Développeur full-stack en alternance</h3>
-          <p class="org">Distrimob <span>· Sablé-sur-Sarthe</span></p>
-          <ul>
-            <li>Développement et maintenance d'applications web full-stack.</li>
-            <li>Gestion et optimisation des bases de données (performance et cohérence).</li>
-          </ul>
+      </section>
+    </div>
+
+    <aside class="side">
+      <section>
+        <div class="sec-title"><b style="background:#1E8E4E">03</b><h2>Compétences</h2></div>
+        <div class="card">
+          <div class="skill-group"><p>Front</p><div class="tags c1"><span>Vue 3</span><span>Angular</span><span>React Native</span><span>TypeScript</span><span>HTML / CSS</span></div></div>
+          <div class="skill-group"><p>Back et données</p><div class="tags c2"><span>Node.js</span><span>Java Spring</span><span>PHP / Symfony</span><span>PostgreSQL</span><span>Firebase</span></div></div>
+          <div class="skill-group"><p>Desktop et outillage</p><div class="tags"><span>Tauri (Rust)</span><span>Python / Qt</span><span>Cloudflare</span><span>GitHub Actions</span></div></div>
+          <div class="skill-group"><p>Support</p><div class="tags"><span>Diagnostic</span><span>Matériel et logiciels</span><span>Réseau</span><span>Formation</span></div></div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section>
-      <h2>Formation</h2>
-      <div class="item">
-        <p class="when">2022 → 2024</p>
-        <div class="what"><h3>Master Ingénieur informatique, option Lead Developer</h3><p class="org">Institut d'Informatique Appliquée <span>· Laval</span></p></div>
-      </div>
-      <div class="item">
-        <p class="when">2021 → 2022</p>
-        <div class="what"><h3>Bachelor Responsable en ingénierie des logiciels</h3><p class="org">CESI <span>· Le Mans</span></p></div>
-      </div>
-      <div class="item">
-        <p class="when">2019 → 2021</p>
-        <div class="what"><h3>BTS Services informatiques aux organisations, option SLAM</h3><p class="org">Lycée André Malraux <span>· Allonnes</span></p></div>
-      </div>
-    </section>
-  </main>
+      <section>
+        <div class="sec-title"><b style="background:#8E44AD">04</b><h2>Projets à essayer</h2></div>
+        <div class="projects">
+          <div class="project"><span class="swatch" style="background:linear-gradient(135deg,#FF6B57,#7A2C6E)"></span><p><b>Torii</b><small>Launcher de jeux pour Windows</small><em>torii-app.fr</em></p></div>
+          <div class="project"><span class="swatch" style="background:#E2477F"></span><p><b>Bloom</b><small>App mobile pour fêter un proche à plusieurs</small><em>bloom.topo-host.com</em></p></div>
+          <div class="project"><span class="swatch" style="background:linear-gradient(135deg,#6B47A0,#E8465A)"></span><p><b>Picsou</b><small>Pilotage d'une agence de conseil</small><em>picsou.topo-host.com</em></p></div>
+          <div class="project"><span class="swatch" style="background:linear-gradient(135deg,#9C6A45,#E0A84A)"></span><p><b>Sites restaurant</b><small>Modules vendus à la carte</small><em>resto.topo-host.com</em></p></div>
+          <div class="project"><span class="swatch" style="background:linear-gradient(135deg,#0F1B2D 50%,#FFC94D 50%)"></span><p><b>Hélio · PingWatch</b><small>Outils d'une équipe support</small><em>topo-host.com</em></p></div>
+        </div>
+      </section>
 
-  <aside>
-    <section class="block">
-      <h2>Contact</h2>
-      <dl class="contact">
-        <div><dt>E-mail</dt><dd><a href="mailto:tompoyeau@hotmail.fr">tompoyeau@hotmail.fr</a></dd></div>
-        <div><dt>Tél.</dt><dd><a href="tel:+33763275088">07 63 27 50 88</a></dd></div>
-        <div><dt>Ville</dt><dd>Le Mans · véhiculé</dd></div>
-        <div><dt>Né le</dt><dd>3 août 2001</dd></div>
-        <div><dt>Site</dt><dd><a href="https://topo-host.com">topo-host.com</a></dd></div>
-        <div><dt>GitHub</dt><dd><a href="https://github.com/tompoyeau">github.com/tompoyeau</a></dd></div>
-      </dl>
-    </section>
-
-    <section class="block">
-      <h2>Compétences</h2>
-      <p class="sub">Front</p>
-      <div class="tags"><span>Vue 3</span><span>Angular</span><span>React Native</span><span>TypeScript</span><span>HTML / CSS</span></div>
-      <p class="sub">Back et données</p>
-      <div class="tags"><span>Node.js</span><span>Java Spring</span><span>PHP / Symfony</span><span>PostgreSQL</span><span>Firebase</span></div>
-      <p class="sub">Desktop et outillage</p>
-      <div class="tags"><span>Tauri (Rust)</span><span>Python / Qt</span><span>Cloudflare</span><span>GitHub Actions</span></div>
-    </section>
-
-    <section class="block">
-      <h2>Projets à essayer</h2>
-      <div class="projects">
-        <p><b>Torii</b> — launcher de jeux pour Windows<a class="url" href="https://torii-app.fr">torii-app.fr</a></p>
-        <p><b>Bloom</b> — app mobile pour fêter un proche à plusieurs<a class="url" href="https://bloom.topo-host.com">bloom.topo-host.com</a></p>
-        <p><b>Picsou</b> — pilotage d'une agence de conseil<a class="url" href="https://picsou.topo-host.com">picsou.topo-host.com</a></p>
-        <p><b>Sites restaurant</b> — modules vendus à la carte<a class="url" href="https://resto.topo-host.com">resto.topo-host.com</a></p>
-        <p><b>Hélio · PingWatch</b> — outils d'équipe support<a class="url" href="https://topo-host.com">topo-host.com</a></p>
-      </div>
-    </section>
-
-    <section class="block">
-      <h2>Langues · intérêts</h2>
-      <p class="plain">Français</p>
-      <p class="plain">Anglais</p>
-      <p class="plain" style="margin-top:2mm">Jeux vidéo, escalade, musique</p>
-    </section>
-  </aside>
+      <section>
+        <div class="sec-title"><b style="background:#E08E0B">05</b><h2>En dehors du code</h2></div>
+        <div class="chips lang"><span>Français</span><span>Anglais</span></div>
+        <div class="chips" style="margin-top:1.6mm"><span>Jeux vidéo</span><span>Escalade</span><span>Musique</span></div>
+      </section>
+    </aside>
+  </div>
 </div>
 </body>
 </html>

@@ -21,7 +21,7 @@ const evalJs = async e => (await send('Runtime.evaluate', { expression: e, await
 await send('Page.navigate', { url: pathToFileURL(resolve(here, 'cv.html')).href })
 await sleep(1500)
 await evalJs('document.fonts.ready.then(() => true)')
-const check = await evalJs(`JSON.stringify([...document.querySelectorAll('main, aside')].map(e => ({ zone: e.tagName, contenu: e.scrollHeight, page: e.clientHeight })))`)
+const check = await evalJs(`JSON.stringify([...document.querySelectorAll('.main, .side, .page')].map(e => ({ zone: e.tagName, contenu: e.scrollHeight, page: e.clientHeight })))`)
 console.log('Hauteurs (px) :', check)
 const fonts = await evalJs(`[...document.fonts].filter(f => f.status === 'loaded').map(f => f.family).filter((v, i, a) => a.indexOf(v) === i).join(', ')`)
 console.log('Polices chargées :', fonts)
