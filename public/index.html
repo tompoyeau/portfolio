@@ -146,6 +146,24 @@ dl{margin:0}
 .hl-legend i{width:10px;height:10px;border-radius:2px}
 .spark{margin-top:16px;width:100%;height:56px}
 
+/* ERP SII : reprend le dégradé violet → rouge de l'application */
+.s-erp{background:#F2F1F4;color:#1D1A24;padding:0;flex-direction:row;align-items:stretch;justify-content:flex-start}
+.erp-side{width:68px;flex:none;background:linear-gradient(180deg,#6B47A0,#E8465A);display:flex;flex-direction:column;gap:12px;padding:18px 0;align-items:center}
+.erp-side i{width:26px;height:6px;border-radius:3px;background:rgba(255,255,255,.55)}
+.erp-side i:first-child{background:#FFFFFF}
+.erp-main{flex:1;min-width:0;padding:18px;display:grid;gap:10px;align-content:center}
+.erp-main h4{margin:0 0 2px;font:700 17px/1.1 var(--display);background:linear-gradient(90deg,#6B47A0,#E8465A);-webkit-background-clip:text;background-clip:text;color:transparent}
+.erp-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.erp-kpi{background:#FFFFFF;border-radius:10px;padding:10px;box-shadow:0 2px 8px rgba(40,20,60,.08)}
+.erp-kpi span{display:block;font-size:10.5px;color:#8A8594;line-height:1.25;overflow-wrap:anywhere}
+.erp-kpi b{display:block;margin-top:6px;font:700 20px/1 var(--display);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.erp-kpi b.up{color:#2E9E5B}
+.erp-ca{background:linear-gradient(135deg,#6B47A0,#E8465A);color:#FFFFFF;border-radius:12px;padding:12px 14px}
+.erp-ca span{display:block;font-size:11px;line-height:1.3;opacity:.85}
+.erp-ca div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.erp-ca b{display:block;font:700 15px/1 var(--display);font-variant-numeric:tabular-nums}
+.erp-ca small{display:block;margin-top:4px;font-size:9.5px;opacity:.85;line-height:1.2}
+
 /* Truffe */
 .s-truffe{background:#FFE7A8;color:#3B2414;align-items:flex-start}
 .bubble{background:#FFFFFF;border:2px solid #3B2414;border-radius:18px;padding:16px 18px;font:700 22px/1.25 var(--display);max-width:22ch;position:relative}
@@ -165,6 +183,13 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
   .itype{grid-column:1/-1;grid-row:2}
 }
 @media (max-width:460px){
+  .erp-ca div{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .erp-side{width:40px}
+  .s-erp figcaption{display:none}
+  .erp-main{padding:14px}
+  .erp-kpis{gap:6px}
+  .erp-kpi{padding:8px}
+  .erp-kpi b{font-size:16px}
   .covers{grid-template-columns:repeat(3,minmax(0,1fr))}
   .covers .cover:nth-child(n+7){display:none}
   .pw-head,.pw-row{grid-template-columns:minmax(0,1.4fr) 62px minmax(0,1fr)}
@@ -193,13 +218,14 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
 </header>
 
 <nav class="index" aria-label="Projets">
-  <h2>6 projets, tous à essayer dans le navigateur</h2>
+  <h2>7 projets, tous à essayer dans le navigateur</h2>
   <ol>
     <li><a href="#torii"><span class="iname">Torii</span><span class="itype">Launcher de jeux pour Windows</span><span class="istat live">À essayer</span></a></li>
     <li><a href="#bloom"><span class="iname">Bloom</span><span class="itype">App mobile pour fêter un proche à plusieurs</span><span class="istat live">À essayer</span></a></li>
     <li><a href="#resto"><span class="iname">Sites restaurant</span><span class="itype">Template + outil de revente clé en main</span><span class="istat live">À essayer</span></a></li>
     <li><a href="#pingwatch"><span class="iname">PingWatch</span><span class="itype">Supervision des sites en panne réseau</span><span class="istat live">À essayer</span></a></li>
     <li><a href="#helio"><span class="iname">Hélio</span><span class="itype">Planning et statistiques d'une équipe support</span><span class="istat live">À essayer</span></a></li>
+    <li><a href="#erp"><span class="iname">ERP SII</span><span class="itype">Pilotage d'une agence de conseil : missions, CA, marge</span><span class="istat live">À essayer</span></a></li>
     <li><a href="#truffe"><span class="iname">La Truffe Gourmande</span><span class="itype">E-commerce de pâtisseries pour chiens</span><span class="istat live">À visiter</span></a></li>
   </ol>
 </nav>
@@ -345,6 +371,37 @@ footer{padding-block:48px 0;display:flex;flex-wrap:wrap;justify-content:space-be
       <path d="M0,40 L50,30 L100,20 L150,24 L200,18 L250,28 L300,42" fill="none" stroke="#FFC94D" stroke-width="1.5" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
     </svg>
     <div class="hl-legend"><span><i class="b-tel"></i>Téléphone</span><span><i class="b-mail"></i>Mails</span><span><i class="b-form"></i>Formation</span><span><i style="background:#FFC94D;height:2px"></i>Prévision</span></div>
+  </figure>
+</section>
+
+<section class="project" id="erp">
+  <div>
+    <p class="meta"><span>Application web de gestion</span><span>SII Le Mans · 2023-2024</span></p>
+    <h3>ERP SII</h3>
+    <p class="pitch">Piloter l'activité d'une agence de conseil : qui travaille sur quelle mission, ce que ça rapporte et ce que ça coûte.</p>
+    <ul class="points">
+      <li><strong>Collaborateurs et clients</strong> : postes, managers, missions, TJM facturé et PRU (coût de revient), avec tout leur historique.</li>
+      <li><strong>Plan de charge et intercontrat</strong> : qui est en mission, qui ne l'est pas, et combien coûte chaque jour sans mission.</li>
+      <li><strong>Statistiques</strong> : chiffre d'affaires par mois, par client et par manager sur l'exercice (avril → mars), comparé à l'année précédente.</li>
+      <li><strong>Mode simulation</strong> : chaque manager travaille sur une copie de la base pour tester un scénario sans toucher aux vraies données.</li>
+    </ul>
+    <div class="tags"><span>Vue 3</span><span>Vuetify</span><span>Express</span><span>Sequelize</span><span>PostgreSQL</span><span>JWT</span><span>Google Charts</span></div>
+    <p class="links"><a class="cta" href="https://erp.topo-host.com" target="_blank" rel="noopener">Essayer la démo</a><span class="hint">Agence et clients fictifs, connexion automatique.</span></p>
+  </div>
+  <figure class="shot s-erp" aria-label="Aperçu du tableau de bord de l'ERP">
+    <div class="erp-side" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="erp-main">
+      <h4>Tableau de bord</h4>
+      <div class="erp-kpis">
+        <div class="erp-kpi"><span>Effectif</span><b>12</b></div>
+        <div class="erp-kpi"><span>CA de l'exercice</span><b>255K</b></div>
+        <div class="erp-kpi"><span>Évolution du CA</span><b class="up">+177 %</b></div>
+      </div>
+      <div class="erp-ca"><span>CA par client depuis le début de l'exercice</span>
+        <div><p><b>101K€</b><small>Banque Horizon</small></p><p><b>53K€</b><small>Assurances du Maine</small></p><p><b>55K€</b><small>TransLog Ouest</small></p><p><b>57K€</b><small>Énergie Verte</small></p></div>
+      </div>
+    </div>
+    <figcaption style="color:#8A8594;left:86px">Données fictives de la démo</figcaption>
   </figure>
 </section>
 
