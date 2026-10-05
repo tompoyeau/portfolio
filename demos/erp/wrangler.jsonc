@@ -7,7 +7,6 @@
     "not_found_handling": "single-page-application"
   },
   "routes": [
-    { "pattern": "picsou.topo-host.com", "custom_domain": true },
-    { "pattern": "erp.topo-host.com", "custom_domain": true }
+    { "pattern": "picsou.topo-host.com", "custom_domain": true }
   ]
 }
