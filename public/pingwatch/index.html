@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PingWatch, démo</title>
+<script src="/theme.js"></script>
 <meta name="description" content="Démo simulée de PingWatch : suivi en direct des sites dont la connexion internet est tombée.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,9 +18,6 @@
   --tint-down:rgba(214,69,65,.10); --tint-partial:rgba(232,96,60,.09); --tint-flap:rgba(142,68,173,.09);
   --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",Consolas,ui-monospace,monospace;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --page:#0F1217; --win:#171B22; --chrome:#1D222B; --ink:#E6EAF0; --muted:#98A1B0; --line:#2B313C; --row:#171B22; --row-alt:#1A1F27;
-  --sel:#232C47; --accent:#8EA2FF; color-scheme:dark}}
 :root[data-theme="dark"]{
   --page:#0F1217; --win:#171B22; --chrome:#1D222B; --ink:#E6EAF0; --muted:#98A1B0; --line:#2B313C; --row:#171B22; --row-alt:#1A1F27;
   --sel:#232C47; --accent:#8EA2FF; color-scheme:dark}
@@ -35,6 +33,8 @@ a{color:var(--accent)}
 .intro h1{font-size:22px;margin:0;line-height:1.2}
 .intro p{margin:6px 0 0;color:var(--muted);max-width:75ch}
 .back{font-size:14px;white-space:nowrap}
+.top-links{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:flex-end}
+.theme-btn{font:inherit;font-size:14px;color:var(--accent);background:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
 .try{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding:0;list-style:none}
 .try li{font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--win);color:var(--muted)}
 .try b{color:var(--ink);font-weight:600}
@@ -85,7 +85,7 @@ td.mono{font-family:var(--mono);font-size:12.5px}
 .log{padding:8px 12px;font:12px/1.6 var(--mono);color:var(--muted);border-top:1px solid var(--line);background:var(--chrome);max-height:96px;overflow:auto}
 .log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .note{font-size:12.5px;color:var(--muted)}
-@media (max-width:720px){.intro{grid-template-columns:1fr}.back{order:-1}}
+@media (max-width:720px){.intro{grid-template-columns:1fr}.top-links{order:-1;justify-content:flex-start}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -102,7 +102,7 @@ td.mono{font-family:var(--mono);font-size:12.5px}
         <li><b>Provoquez</b> une coupure</li>
       </ul>
     </div>
-    <a class="back" href="/#pingwatch">← Retour au portfolio</a>
+    <div class="top-links"><button class="theme-btn" type="button" data-theme-toggle aria-pressed="false"><span data-theme-label>Mode sombre</span></button><a class="back" href="/#pingwatch">← Retour au portfolio</a></div>
   </section>
 
   <div class="window" role="application" aria-label="Fenêtre PingWatch simulée">
