@@ -113,6 +113,17 @@ demos.bloom = async function bloom() {
   walk(out)
 }
 
+// La Truffe Gourmande est un site statique sans build : on copie seulement les pages et `assets/`
+// (pas le README ni le dossier .git du dépôt).
+demos.truffe = async function truffe() {
+  const { cpSync, rmSync, readdirSync } = await import('node:fs')
+  const root = resolve(here, '../../truffe-gourmande')
+  const out = resolve(here, 'truffe/dist')
+  rmSync(out, { recursive: true, force: true })
+  cpSync(resolve(root, 'assets'), resolve(out, 'assets'), { recursive: true })
+  readdirSync(root).filter(f => f.endsWith('.html')).forEach(f => cpSync(resolve(root, f), resolve(out, f)))
+}
+
 if (!demos[name]) { console.error('Démo inconnue. Choix : ' + Object.keys(demos).join(', ')); process.exit(1) }
 await demos[name]()
 console.log('Démo « ' + name + ' » compilée dans demos/' + name + '/dist')

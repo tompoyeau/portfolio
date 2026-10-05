@@ -20,6 +20,7 @@ La configuration (nom du Worker, domaine) est dans `wrangler.jsonc`.
 | Sites restaurant | https://resto.topo-host.com | `../laromate` |
 | Hélio | https://helio.topo-host.com | `../helpdesk/vue-app` |
 | Bloom | https://bloom.topo-host.com | `../bloom` |
+| La Truffe Gourmande | https://truffe.topo-host.com | `../truffe-gourmande` (copie des pages, sans build) |
 
 Les démos sont compilées à partir des dépôts voisins, sans rien y écrire durablement. Firebase y est
 remplacé par un faux Firestore en mémoire (`demos/kit/`) : aucune vraie base n'est contactée, les
@@ -27,7 +28,7 @@ données de départ viennent de `demos/<démo>/seed.js` et les changements du vi
 son onglet. Le bouton « Réinitialiser » du bandeau remet la démo à zéro.
 
 ```bash
-node demos/build.mjs resto     # ou helio, bloom
+node demos/build.mjs resto     # ou helio, bloom, truffe
 npx wrangler deploy --config demos/resto/wrangler.jsonc
 ```
 
