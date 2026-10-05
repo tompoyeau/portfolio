@@ -124,6 +124,31 @@ demos.truffe = async function truffe() {
   readdirSync(root).filter(f => f.endsWith('.html')).forEach(f => cpSync(resolve(root, f), resolve(out, f)))
 }
 
+// ERP SII (« Picsou ») : Vue CLI, donc pas d'alias Vite. Le temps du build, on copie le faux serveur
+// (demos/erp/setup.js + snapshot.json) dans front/src/__demo__ et on l'importe en tête de main.js,
+// puis on remet main.js tel quel. Les réponses viennent de demos/erp/record.mjs.
+demos.erp = async function erp() {
+  const { readFileSync, writeFileSync, cpSync, rmSync } = await import('node:fs')
+  const { execSync } = await import('node:child_process')
+  const root = resolve(here, '../../erp-sii/front')
+  const out = resolve(here, 'erp/dist')
+  const mainPath = resolve(root, 'src/main.js'), tmp = resolve(root, 'src/__demo__')
+  const main = readFileSync(mainPath, 'utf8')
+  try {
+    for (const f of ['setup.js', 'demo-key.js', 'snapshot.json']) cpSync(resolve(here, 'erp', f), resolve(tmp, f))
+    writeFileSync(mainPath, "import './__demo__/setup'\n" + main)
+    execSync(`npx vue-cli-service build --dest "${out}"`, { cwd: root, stdio: 'inherit' })
+  } finally {
+    writeFileSync(mainPath, main)
+    rmSync(tmp, { recursive: true, force: true })
+  }
+  const recorded = new Date(JSON.parse(readFileSync(resolve(here, 'erp/snapshot.json'), 'utf8')).recordedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const bar = '<style>#demo-bar{position:fixed;z-index:2147483000;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 24px);display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 12px;border-radius:8px;background:#151a17;color:#f1f2ee;font:500 13px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25)}#demo-bar a{color:#b9c6ff}</style>'
+    + `<div id="demo-bar" role="note"><b>Démo</b> · données fictives, figées au ${recorded}. Les modifications ne sont pas enregistrées. <a href="https://topo-host.com/">Portfolio</a></div>`
+  const index = resolve(out, 'index.html')
+  writeFileSync(index, readFileSync(index, 'utf8').replace('</body>', bar + '</body>'))
+}
+
 if (!demos[name]) { console.error('Démo inconnue. Choix : ' + Object.keys(demos).join(', ')); process.exit(1) }
 await demos[name]()
 console.log('Démo « ' + name + ' » compilée dans demos/' + name + '/dist')
