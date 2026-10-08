@@ -19,13 +19,26 @@ async function load(root, ...candidates) {
   throw new Error('Introuvable dans ' + root + ' : ' + candidates.join(', '))
 }
 
-// Bandeau « démo » ajouté en haut de chaque page.
-function banner(html) {
+// Statistiques de visite (Umami auto-hébergé, sans cookie) : pages vues automatiques et clics
+// marqués `data-umami-event`. `data-domains` : rien n'est compté en local (wrangler dev).
+// Hélio n'est pas ici : il embarque son propre suivi (vue-app/src/analytics.ts).
+const STATS = {
+  resto: ['6d23e235-9440-4c31-9bb9-f6ce1c831e1d', 'resto.topo-host.com'],
+  bloom: ['41efdad6-7e17-40ce-b824-46b5fe837bb7', 'bloom.topo-host.com'],
+}
+const statsAttrs = ([id, domain]) => ({ defer: true, src: 'https://stats.topo-host.com/t.js', 'data-website-id': id, 'data-domains': domain })
+const statsTag = s => '<script ' + Object.entries(statsAttrs(s)).map(([k, v]) => v === true ? k : `${k}="${v}"`).join(' ') + '></script>'
+const ev = (stats, name) => stats ? ` data-umami-event="${name}"` : ''
+const barButtons = stats => ` <button type="button" onclick="window.__resetDemo&&window.__resetDemo()"${ev(stats, 'Réinitialiser la démo')}>Réinitialiser</button> <a href="https://topo-host.com/"${ev(stats, 'Retour au portfolio')}>Portfolio</a>`
+
+// Bandeau « démo » ajouté en haut de chaque page (et les statistiques, si la démo en a).
+function banner(html, stats) {
   return {
     name: 'demo-banner',
     transformIndexHtml: { order: 'post', handler: () => [
       { tag: 'style', children: '#demo-bar{position:fixed;z-index:2147483000;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 24px);display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 12px;border-radius:8px;background:#151a17;color:#f1f2ee;font:500 13px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25)}#demo-bar a,#demo-bar button{color:#b9c6ff;background:none;border:0;padding:0;font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:2px}#demo-bar b{font-weight:700}', injectTo: 'head' },
-      { tag: 'div', attrs: { id: 'demo-bar', role: 'note' }, children: html + ' <button type="button" onclick="window.__resetDemo&&window.__resetDemo()">Réinitialiser</button> <a href="https://topo-host.com/">Portfolio</a>', injectTo: 'body' },
+      { tag: 'div', attrs: { id: 'demo-bar', role: 'note' }, children: html + barButtons(stats), injectTo: 'body' },
+      ...(stats ? [{ tag: 'script', attrs: statsAttrs(stats), injectTo: 'head' }] : []),
     ] },
   }
 }
@@ -40,7 +53,7 @@ const demos = {
     FEATURES.forEach(k => { define[`__FEAT_${k.toUpperCase()}__`] = 'true' })
     return build({
       configFile: false, root, base: '/', mode: 'production', logLevel: 'warn', envDir: kit(''), // aucun .env du projet (vraie config Firebase)
-      plugins: [vue(), banner('<b>Démo</b> · restaurant fictif, tous les modules activés. Espace gérant : <a href="/admin">/admin</a>, mot de passe <b>admin</b>.')],
+      plugins: [vue(), banner('<b>Démo</b> · restaurant fictif, tous les modules activés. Espace gérant : <a href="/admin" data-umami-event="Espace gérant (bandeau)">/admin</a>, mot de passe <b>admin</b>.', STATS.resto)],
       define,
       resolve: { alias: {
         '@demo-seed': resolve(here, 'resto/seed.js'),
@@ -108,8 +121,8 @@ demos.bloom = async function bloom() {
   }
   // Bandeau de démo dans chaque page HTML produite.
   const bar = '<style>#demo-bar{position:fixed;z-index:2147483000;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 24px);display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 12px;border-radius:8px;background:#151a17;color:#f1f2ee;font:500 13px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25)}#demo-bar a,#demo-bar button{color:#b9c6ff;background:none;border:0;padding:0;font:inherit;cursor:pointer;text-decoration:underline}</style>'
-    + '<div id="demo-bar" role="note"><b>Démo</b> · vous êtes Alex, qui prépare la surprise de Camille. Tout est fictif. <button type="button" onclick="window.__resetDemo&&window.__resetDemo()">Réinitialiser</button> <a href="https://topo-host.com/">Portfolio</a></div>'
-  const walk = d => readdirSync(d).forEach(f => { const p = resolve(d, f); if (statSync(p).isDirectory()) walk(p); else if (p.endsWith('.html')) writeFileSync(p, readFileSync(p, 'utf8').replace('</body>', bar + '</body>')) })
+    + '<div id="demo-bar" role="note"><b>Démo</b> · vous êtes Alex, qui prépare la surprise de Camille. Tout est fictif.' + barButtons(STATS.bloom) + '</div>'
+  const walk = d => readdirSync(d).forEach(f => { const p = resolve(d, f); if (statSync(p).isDirectory()) walk(p); else if (p.endsWith('.html')) writeFileSync(p, readFileSync(p, 'utf8').replace('</head>', statsTag(STATS.bloom) + '</head>').replace('</body>', bar + '</body>')) })
   walk(out)
 }
 
