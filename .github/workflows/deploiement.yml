@@ -1,0 +1,73 @@
+# Déploiement automatique sur Cloudflare (Workers à assets statiques).
+#
+# - à chaque push sur main : le site et les démos (le code des démos vit en partie ici) ;
+# - chaque nuit : les démos sont reconstruites depuis le dernier commit de leur projet
+#   (helpdesk, truffe-gourmande) — un push là-bas est en ligne le lendemain matin ;
+# - à la demande : onglet Actions → « Déploiement » → Run workflow.
+#
+# Restent déployés à la main : Bloom (pas de dépôt GitHub), Picsou (projet figé) et Resto
+# (la démo dépend de modifications de laromate qui ne sont pas encore sur GitHub) :
+#   node demos/build.mjs <resto|bloom|erp> && npx wrangler deploy --config demos/<x>/wrangler.jsonc
+#
+# Secret requis : CLOUDFLARE_API_TOKEN (jeton « Modifier les Workers Cloudflare »).
+name: Déploiement
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: deploiement
+  cancel-in-progress: false
+
+env:
+  CLOUDFLARE_ACCOUNT_ID: 995a8741fb4e0eb34001e3cb33d656a5
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  WRANGLER: wrangler@4.148.0
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npx --yes $WRANGLER deploy
+
+  demo:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - demo: helio
+            depot: tompoyeau/helpdesk
+            dossier: helpdesk
+            installer: helpdesk/vue-app
+          - demo: truffe
+            depot: tompoyeau/truffe-gourmande
+            dossier: truffe-gourmande
+            installer: ""
+    steps:
+      # build.mjs cherche le projet à côté du portfolio (`../../<projet>` depuis demos/).
+      - uses: actions/checkout@v4
+        with:
+          path: portfolio
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.depot }}
+          path: ${{ matrix.dossier }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - if: matrix.installer != ''
+        run: npm ci --no-audit --no-fund
+        working-directory: ${{ matrix.installer }}
+      - run: node demos/build.mjs ${{ matrix.demo }}
+        working-directory: portfolio
+      - run: npx --yes $WRANGLER deploy --config demos/${{ matrix.demo }}/wrangler.jsonc
+        working-directory: portfolio
