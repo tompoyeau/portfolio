@@ -25,6 +25,8 @@ async function load(root, ...candidates) {
 const STATS = {
   resto: ['6d23e235-9440-4c31-9bb9-f6ce1c831e1d', 'resto.topo-host.com'],
   bloom: ['41efdad6-7e17-40ce-b824-46b5fe837bb7', 'bloom.topo-host.com'],
+  truffe: ['9de9f1db-3f86-4ebe-a904-929ddbb2695b', 'truffe.topo-host.com'],
+  erp: ['7dc0f764-0f2c-463f-94b1-213e95a461e3', 'picsou.topo-host.com'],
 }
 const statsAttrs = ([id, domain]) => ({ defer: true, src: 'https://stats.topo-host.com/t.js', 'data-website-id': id, 'data-domains': domain })
 const statsTag = s => '<script ' + Object.entries(statsAttrs(s)).map(([k, v]) => v === true ? k : `${k}="${v}"`).join(' ') + '></script>'
@@ -128,13 +130,17 @@ demos.bloom = async function bloom() {
 
 // La Truffe Gourmande est un site statique sans build : on copie seulement les pages et `assets/`
 // (pas le README ni le dossier .git du dépôt).
+// Statistiques ajoutées à la copie : les clics du parcours d'achat (simulé) en plus des pages vues.
 demos.truffe = async function truffe() {
-  const { cpSync, rmSync, readdirSync } = await import('node:fs')
+  const { cpSync, rmSync, readdirSync, readFileSync, writeFileSync } = await import('node:fs')
   const root = resolve(here, '../../truffe-gourmande')
   const out = resolve(here, 'truffe/dist')
   rmSync(out, { recursive: true, force: true })
   cpSync(resolve(root, 'assets'), resolve(out, 'assets'), { recursive: true })
-  readdirSync(root).filter(f => f.endsWith('.html')).forEach(f => cpSync(resolve(root, f), resolve(out, f)))
+  const clics = "<script>document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('.add,#cart,.btn--pay');if(!t||!window.umami)return;"
+    + "if(t.matches('.add'))umami.track('Ajout à la gamelle',{produit:t.dataset.name});else if(t.matches('#cart'))umami.track('Gamelle ouverte');else umami.track('Paiement (simulé)')},true)</script>"
+  readdirSync(root).filter(f => f.endsWith('.html')).forEach(f =>
+    writeFileSync(resolve(out, f), readFileSync(resolve(root, f), 'utf8').replace('</head>', statsTag(STATS.truffe) + clics + '</head>')))
 }
 
 // ERP SII (« Picsou ») : Vue CLI, donc pas d'alias Vite. Le temps du build, on copie le faux serveur
@@ -180,9 +186,9 @@ demos.erp = async function erp() {
   }
   const recorded = new Date(JSON.parse(readFileSync(resolve(here, 'erp/snapshot.json'), 'utf8')).recordedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
   const bar = '<style>#demo-bar{position:fixed;z-index:2147483000;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 24px);display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 12px;border-radius:8px;background:#151a17;color:#f1f2ee;font:500 13px/1.4 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25)}#demo-bar a{color:#b9c6ff}</style>'
-    + `<div id="demo-bar" role="note"><b>Démo</b> · données fictives, figées au ${recorded}. Les modifications ne sont pas enregistrées. <a href="https://topo-host.com/">Portfolio</a></div>`
+    + `<div id="demo-bar" role="note"><b>Démo</b> · données fictives, figées au ${recorded}. Les modifications ne sont pas enregistrées. <a href="https://topo-host.com/"${ev(STATS.erp, 'Retour au portfolio')}>Portfolio</a></div>`
   const index = resolve(out, 'index.html')
-  writeFileSync(index, readFileSync(index, 'utf8').replace('</body>', bar + '</body>'))
+  writeFileSync(index, readFileSync(index, 'utf8').replace('</head>', statsTag(STATS.erp) + '</head>').replace('</body>', bar + '</body>'))
 }
 
 if (!demos[name]) { console.error('Démo inconnue. Choix : ' + Object.keys(demos).join(', ')); process.exit(1) }
